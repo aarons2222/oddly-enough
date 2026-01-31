@@ -21,6 +21,7 @@ import { SkeletonCard } from '../components/SkeletonCard';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
 import { SettingsModal } from '../components/SettingsModal';
+import { UfoAbduction } from '../components/UfoAbduction';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 interface Props {
@@ -175,16 +176,18 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     
     return (
       <AnimatedCard index={index}>
-        <View style={{ transform: [{ rotate: `${chaosRotation}deg` }, { scale: chaosScale }] }}>
-          <ArticleCard
-            article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
-            onPress={() => handleArticlePress(item)}
-            onBookmark={() => handleBookmark(item)}
-            onReact={(emoji) => setReaction(item.id, emoji)}
-            theme={theme}
-            chaosMode={chaosMode}
-          />
-        </View>
+        <UfoAbduction enabled={chaosMode} articleId={item.id}>
+          <View style={{ transform: [{ rotate: `${chaosRotation}deg` }, { scale: chaosScale }] }}>
+            <ArticleCard
+              article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
+              onPress={() => handleArticlePress(item)}
+              onBookmark={() => handleBookmark(item)}
+              onReact={(emoji) => setReaction(item.id, emoji)}
+              theme={theme}
+              chaosMode={chaosMode}
+            />
+          </View>
+        </UfoAbduction>
       </AnimatedCard>
     );
   };
