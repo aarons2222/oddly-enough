@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  ActivityIndicator,
   TouchableOpacity,
   Platform,
 } from 'react-native';
@@ -20,6 +19,7 @@ import { AdBanner } from '../components/AdBanner';
 import { AnimatedCard } from '../components/AnimatedCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { UfoRefresh } from '../components/UfoRefresh';
+import { ScreenBugs } from '../components/ScreenBugs';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 interface Props {
@@ -186,7 +186,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       <TouchableOpacity onPress={handleRefresh} style={styles.logoContainer} activeOpacity={0.7}>
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
-        {refreshing && <ActivityIndicator size="small" color={theme.accent} style={{ marginLeft: 8 }} />}
       </TouchableOpacity>
       <TouchableOpacity onPress={toggleDarkMode} style={styles.headerButton}>
         <Ionicons 
@@ -209,6 +208,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
+      <ScreenBugs />
       {renderHeader()}
       <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
       

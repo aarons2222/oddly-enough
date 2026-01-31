@@ -22,6 +22,7 @@ import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 import { getCachedContent, setCachedContent } from '../services/contentCache';
 import { Confetti } from '../components/Confetti';
 import { ShareSheet } from '../components/ShareSheet';
+import { ScreenBugs } from '../components/ScreenBugs';
 
 interface Props {
   article: Article;
@@ -290,6 +291,10 @@ export function ArticleScreen({ article, onBack }: Props) {
         url={article.url}
         summary={article.summary}
       />
+      
+      {/* Screen Bugs */}
+      <ScreenBugs />
+      
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
