@@ -1,0 +1,286 @@
+import React, { useState, useRef, memo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+  Animated,
+  Pressable,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Article, CATEGORIES } from '../types/Article';
+import { formatDistanceToNow } from 'date-fns';
+import { Theme, lightTheme } from '../context/AppContext';
+
+interface Props {
+  article: Article & { reaction?: string };
+  onPress: () => void;
+  onBookmark?: () => void;
+  onReact?: (emoji: string) => void;
+  theme?: Theme;
+}
+
+export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme }: Props) {
+  const [imageError, setImageError] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const categoryInfo = CATEGORIES.find(c => c.id === article.category);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+  
+  const handleShare = async () => {
+    const shareText = `${article.title}\n\n${article.summary}\n\nRead more: ${article.url}`;
+    
+    if (Platform.OS === 'web') {
+      // Try Web Share API first (works on mobile Safari)
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: article.title,
+            text: article.summary,
+            url: article.url,
+          });
+          return;
+        } catch (error: any) {
+          // User cancelled or not supported - fall through to clipboard
+          if (error.name === 'AbortError') return;
+        }
+      }
+      
+      // Fallback: copy to clipboard
+      try {
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(article.url);
+          alert('Link copied to clipboard!');
+        } else {
+          // Last resort fallback
+          const textArea = document.createElement('textarea');
+          textArea.value = article.url;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          alert('Link copied!');
+        }
+      } catch (err) {
+        alert(`Share this link: ${article.url}`);
+      }
+    } else {
+      // Native share
+      const { Share } = require('react-native');
+      try {
+        await Share.share({
+          title: article.title,
+          message: shareText,
+          url: article.url,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    if (Platform.OS === 'web' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  const timeAgo = formatDistanceToNow(article.publishedAt, { addSuffix: true });
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Animated.View 
+        style={[
+          styles.card, 
+          { backgroundColor: theme.card, transform: [{ scale: scaleAnim }] }
+        ]}
+      >
+      {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
+        <Image 
+          source={{ uri: article.imageUrl }} 
+          style={styles.image}
+          resizeMode="cover"
+          onError={() => setImageError(true)}
+        />
+      ) : null}
+      
+      {/* Always show placeholder behind image, visible when image fails or is loading */}
+      {(!article.imageUrl || imageError) && (
+        <View style={[styles.image, styles.placeholderImage]}>
+          <Text style={styles.placeholderEmoji}>{categoryInfo?.emoji || '📰'}</Text>
+          <Text style={[styles.placeholderText, { color: '#FF6B6B' }]}>{article.source}</Text>
+        </View>
+      )}
+      
+      <View style={styles.content}>
+        <View style={styles.meta}>
+          <View style={[styles.categoryBadge, { backgroundColor: theme.categoryBg }]}>
+            <Text style={styles.categoryEmoji}>{categoryInfo?.emoji}</Text>
+            <Text style={[styles.categoryText, { color: theme.textSecondary }]}>
+              {categoryInfo?.label}
+            </Text>
+          </View>
+          <Text style={[styles.source, { color: theme.textMuted }]}>{article.source}</Text>
+          <Text style={[styles.dot, { color: theme.border }]}>•</Text>
+          <Text style={[styles.time, { color: theme.textMuted }]}>{timeAgo}</Text>
+        </View>
+        
+        <Text style={[styles.title, { color: theme.text }]} numberOfLines={3}>
+          {article.title}
+        </Text>
+        
+        <Text style={[styles.summary, { color: theme.textSecondary }]} numberOfLines={2}>
+          {article.summary}
+        </Text>
+        
+        <View style={styles.actions}>
+          <View style={styles.reactions}>
+            <TouchableOpacity 
+              onPress={() => onReact?.('🤯')} 
+              style={[styles.reactionButton, article.reaction === '🤯' && styles.reactionActive]}
+            >
+              <Text style={styles.reactionEmoji}>🤯</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => onReact?.('😂')} 
+              style={[styles.reactionButton, article.reaction === '😂' && styles.reactionActive]}
+            >
+              <Text style={styles.reactionEmoji}>😂</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => onReact?.('🤮')} 
+              style={[styles.reactionButton, article.reaction === '🤮' && styles.reactionActive]}
+            >
+              <Text style={styles.reactionEmoji}>🤮</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      </Animated.View>
+    </Pressable>
+  );
+});
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  image: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#E0E0E0',
+  },
+  placeholderImage: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#2a2a2a',
+  },
+  placeholderEmoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  placeholderText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  content: {
+    padding: 16,
+  },
+  meta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    flexWrap: 'wrap',
+  },
+  categoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  categoryEmoji: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+  categoryText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  source: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  dot: {
+    fontSize: 12,
+    marginHorizontal: 6,
+  },
+  time: {
+    fontSize: 12,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
+    marginBottom: 8,
+  },
+  summary: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 12,
+  },
+  actionButton: {
+    padding: 8,
+  },
+  reactions: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  reactionButton: {
+    padding: 6,
+    borderRadius: 20,
+    opacity: 0.5,
+  },
+  reactionActive: {
+    opacity: 1,
+    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+  },
+  reactionEmoji: {
+    fontSize: 20,
+  },
+});

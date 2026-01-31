@@ -1,30 +1,52 @@
 {
   "expo": {
-    "name": "oddly-enough",
+    "name": "Oddly Enough",
     "slug": "oddly-enough",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#121212",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#121212"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.oddlyenough.app",
+      "backgroundColor": "#121212",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#121212"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.oddlyenough.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "backgroundColor": "#121212",
+      "themeColor": "#121212",
+      "name": "Oddly Enough",
+      "shortName": "Oddly",
+      "description": "Weird and wonderful news from around the world",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/",
+      "scope": "/"
+    },
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "4ec857a3-ead4-4d5c-8889-2b63f549affe"
+      }
+    },
+    "owner": "aaron1986"
   }
 }

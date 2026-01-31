@@ -1,0 +1,100 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const CONTENT_CACHE_PREFIX = 'oddly_content_';
+const CONTENT_TTL = 60 * 60 * 1000; // 1 hour
+
+interface CachedContent {
+  content: string;
+  timestamp: number;
+}
+
+// In-memory cache for faster access
+const memoryContentCache: Map<string, string> = new Map();
+
+export async function getCachedContent(articleUrl: string): Promise<string | null> {
+  // Check memory first
+  if (memoryContentCache.has(articleUrl)) {
+    return memoryContentCache.get(articleUrl) || null;
+  }
+  
+  try {
+    const key = CONTENT_CACHE_PREFIX + encodeURIComponent(articleUrl);
+    const cached = await AsyncStorage.getItem(key);
+    
+    if (!cached) return null;
+    
+    const data: CachedContent = JSON.parse(cached);
+    
+    // Check TTL
+    if (Date.now() - data.timestamp > CONTENT_TTL) {
+      await AsyncStorage.removeItem(key);
+      return null;
+    }
+    
+    // Store in memory for faster subsequent access
+    memoryContentCache.set(articleUrl, data.content);
+    
+    return data.content;
+  } catch (error) {
+    console.error('Error reading content cache:', error);
+    return null;
+  }
+}
+
+export async function setCachedContent(articleUrl: string, content: string): Promise<void> {
+  try {
+    const key = CONTENT_CACHE_PREFIX + encodeURIComponent(articleUrl);
+    const data: CachedContent = {
+      content,
+      timestamp: Date.now(),
+    };
+    
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+    memoryContentCache.set(articleUrl, content);
+  } catch (error) {
+    console.error('Error writing content cache:', error);
+  }
+}
+
+// Preload content for multiple articles
+export async function preloadArticleContent(
+  articleUrls: string[],
+  apiUrl: string
+): Promise<void> {
+  const uncachedUrls = [];
+  
+  // Check which ones need fetching
+  for (const url of articleUrls) {
+    const cached = await getCachedContent(url);
+    if (!cached) {
+      uncachedUrls.push(url);
+    }
+  }
+  
+  if (uncachedUrls.length === 0) {
+    return;
+  }
+  
+  // Fetch in parallel (limit to 5 at a time)
+  const batchSize = 5;
+  for (let i = 0; i < uncachedUrls.length; i += batchSize) {
+    const batch = uncachedUrls.slice(i, i + batchSize);
+    
+    await Promise.all(batch.map(async (articleUrl) => {
+      try {
+        const response = await fetch(
+          `${apiUrl}/api/content?url=${encodeURIComponent(articleUrl)}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.content) {
+            await setCachedContent(articleUrl, data.content);
+          }
+        }
+      } catch (error) {
+        // Failed to preload silently
+      }
+    }));
+  }
+}
