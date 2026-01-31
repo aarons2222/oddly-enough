@@ -122,7 +122,11 @@ function SingleBug({ bug, onComplete }: { bug: Bug; onComplete: () => void }) {
   );
 }
 
-export function ScreenBugs() {
+interface ScreenBugsProps {
+  chaosMode?: boolean;
+}
+
+export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
   const [bugs, setBugs] = useState<Bug[]>([]);
   const bugIdRef = useRef(0);
 
@@ -169,22 +173,28 @@ export function ScreenBugs() {
       setBugs(prev => [...prev, newBug]);
     };
 
-    // Initial delay before first bug
+    // Initial delay before first bug (shorter in chaos mode)
+    const initialDelay = chaosMode ? 1000 : 5000 + Math.random() * 5000;
+    const spawnInterval = chaosMode ? 2000 + Math.random() * 2000 : 8000 + Math.random() * 7000;
+    const spawnChance = chaosMode ? 0.9 : 0.7;
+    
     const initialTimeout = setTimeout(() => {
       spawnBug();
+      if (chaosMode) spawnBug(); // Extra bug in chaos mode
       
       // Then spawn periodically
       const interval = setInterval(() => {
-        if (Math.random() > 0.3) { // 70% chance each interval
+        if (Math.random() < spawnChance) {
           spawnBug();
+          if (chaosMode && Math.random() > 0.5) spawnBug(); // Sometimes spawn 2
         }
-      }, 8000 + Math.random() * 7000); // Every 8-15 seconds
+      }, spawnInterval);
 
       return () => clearInterval(interval);
-    }, 5000 + Math.random() * 5000); // First bug after 5-10 seconds
+    }, initialDelay);
 
     return () => clearTimeout(initialTimeout);
-  }, []);
+  }, [chaosMode]);
 
   const removeBug = (id: number) => {
     setBugs(prev => prev.filter(b => b.id !== id));

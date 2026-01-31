@@ -20,6 +20,7 @@ import { AnimatedCard } from '../components/AnimatedCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
+import { SettingsModal } from '../components/SettingsModal';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 interface Props {
@@ -28,11 +29,12 @@ interface Props {
 }
 
 export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
-  const { isDarkMode, toggleDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction } = useApp();
+  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [category, setCategory] = useState<Category>('all');
 
@@ -187,9 +189,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={toggleDarkMode} style={styles.headerButton}>
+      <TouchableOpacity onPress={() => setShowSettings(true)} style={styles.headerButton}>
         <Ionicons 
-          name={isDarkMode ? "sunny" : "moon"} 
+          name="settings-outline" 
           size={22} 
           color={theme.text} 
         />
@@ -208,7 +210,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-      <ScreenBugs />
+      <ScreenBugs chaosMode={chaosMode} />
       {renderHeader()}
       <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
       
@@ -243,6 +245,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       
       {/* Bottom Ad Banner */}
       <AdBanner style={styles.adBanner} />
+      
+      {/* Settings Modal */}
+      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </SafeAreaView>
   );
 }
