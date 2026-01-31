@@ -56,6 +56,7 @@ export function SettingsModal({ visible, onClose }: Props) {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const bgOpacity = useRef(new Animated.Value(0)).current;
   const titleWobble = useRef(new Animated.Value(0)).current;
+  const wobbleAnimation = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -64,16 +65,24 @@ export function SettingsModal({ visible, onClose }: Props) {
         Animated.timing(bgOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]).start();
       
-      // Title wobble
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(titleWobble, { toValue: 1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-          Animated.timing(titleWobble, { toValue: -1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        ])
-      ).start();
+      // Title wobble - only start if not already running
+      if (!wobbleAnimation.current) {
+        wobbleAnimation.current = Animated.loop(
+          Animated.sequence([
+            Animated.timing(titleWobble, { toValue: 1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+            Animated.timing(titleWobble, { toValue: -1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+          ])
+        );
+        wobbleAnimation.current.start();
+      }
     } else {
       slideAnim.setValue(height);
       bgOpacity.setValue(0);
+      // Stop wobble when closing
+      if (wobbleAnimation.current) {
+        wobbleAnimation.current.stop();
+        wobbleAnimation.current = null;
+      }
     }
   }, [visible]);
 
