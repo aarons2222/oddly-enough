@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FeedScreen } from './src/screens/FeedScreen';
 import { ArticleScreen } from './src/screens/ArticleScreen';
 import { BookmarksScreen } from './src/screens/BookmarksScreen';
+import { WeirdSplash } from './src/components/WeirdSplash';
 import { AppProvider, useApp, lightTheme, darkTheme } from './src/context/AppContext';
 import { Article } from './src/types/Article';
 
@@ -15,6 +16,7 @@ const { height } = Dimensions.get('window');
 function AppContent() {
   const { isDarkMode } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
+  const [showSplash, setShowSplash] = useState(true);
   const [currentScreen, setCurrentScreen] = useState<Screen>('feed');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [previousScreen, setPreviousScreen] = useState<Screen>('feed');
@@ -83,6 +85,16 @@ function AppContent() {
       }).start();
     });
   };
+
+  // Show splash screen on launch
+  if (showSplash) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <WeirdSplash onFinish={() => setShowSplash(false)} />
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
