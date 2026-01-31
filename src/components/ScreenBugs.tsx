@@ -129,6 +129,7 @@ interface ScreenBugsProps {
 export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
   const [bugs, setBugs] = useState<Bug[]>([]);
   const bugIdRef = useRef(0);
+  const bugCountRef = useRef(0); // Track active bugs
 
   useEffect(() => {
     const spawnBug = () => {
@@ -173,30 +174,40 @@ export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
       setBugs(prev => [...prev, newBug]);
     };
 
-    // Initial delay before first bug (shorter in chaos mode)
-    const initialDelay = chaosMode ? 1000 : 15000 + Math.random() * 15000; // Normal: 15-30s
-    const spawnInterval = chaosMode ? 2000 + Math.random() * 2000 : 25000 + Math.random() * 20000; // Normal: 25-45s
-    const spawnChance = chaosMode ? 0.9 : 0.4; // Normal: 40% chance
+    // Settings based on mode
+    const initialDelay = chaosMode ? 1000 : 25000 + Math.random() * 20000; // Normal: 25-45s first bug
+    const spawnInterval = chaosMode ? 2000 + Math.random() * 2000 : 40000 + Math.random() * 30000; // Normal: 40-70s between
+    const spawnChance = chaosMode ? 0.9 : 0.25; // Normal: 25% chance
+    const maxBugs = chaosMode ? 10 : 1; // Normal: only 1 bug at a time!
+    
+    const trySpawnBug = () => {
+      if (bugCountRef.current >= maxBugs) return;
+      if (Math.random() > spawnChance && bugCountRef.current > 0) return; // Skip if chance fails (always spawn first)
+      
+      bugCountRef.current++;
+      spawnBug();
+    };
     
     const initialTimeout = setTimeout(() => {
-      spawnBug();
-      if (chaosMode) spawnBug(); // Extra bug in chaos mode
+      trySpawnBug();
+      if (chaosMode) trySpawnBug();
       
-      // Then spawn periodically
       const interval = setInterval(() => {
-        if (Math.random() < spawnChance) {
-          spawnBug();
-          if (chaosMode && Math.random() > 0.5) spawnBug(); // Sometimes spawn 2
-        }
+        trySpawnBug();
+        if (chaosMode && Math.random() > 0.5) trySpawnBug();
       }, spawnInterval);
 
       return () => clearInterval(interval);
     }, initialDelay);
 
-    return () => clearTimeout(initialTimeout);
+    return () => {
+      clearTimeout(initialTimeout);
+      bugCountRef.current = 0;
+    };
   }, [chaosMode]);
 
   const removeBug = (id: number) => {
+    bugCountRef.current = Math.max(0, bugCountRef.current - 1);
     setBugs(prev => prev.filter(b => b.id !== id));
   };
 
