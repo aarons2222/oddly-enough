@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
+import { ScreenBugs } from './ScreenBugs';
 
 const { width, height } = Dimensions.get('window');
 
@@ -171,8 +172,8 @@ export function WeirdSplash({ onFinish }: Props) {
       useNativeDriver: true,
     }).start();
 
-    // Finish after 2.5 seconds
-    const finishTimeout = setTimeout(onFinish, 2500);
+    // Finish after 4.5 seconds (longer so bugs can run)
+    const finishTimeout = setTimeout(onFinish, 4500);
 
     return () => {
       clearInterval(glitchInterval);
@@ -192,6 +193,9 @@ export function WeirdSplash({ onFinish }: Props) {
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: bgColor }]}>
+      {/* Bugs scurrying across */}
+      <ScreenBugs chaosMode={true} />
+      
       {/* Floating emojis */}
       {floatingEmojis.map((props, i) => (
         <FloatingEmoji key={i} {...props} />
