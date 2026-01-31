@@ -18,8 +18,6 @@ interface AppContextType {
   setChaosMode: (enabled: boolean) => void;
   bugsEnabled: boolean;
   setBugsEnabled: (enabled: boolean) => void;
-  drunkMode: boolean;
-  setDrunkMode: (enabled: boolean) => void;
   bookmarks: Article[];
   addBookmark: (article: Article) => void;
   removeBookmark: (articleId: string) => void;
@@ -43,7 +41,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [fontSize, setFontSizeState] = useState<FontSize>('medium');
   const [chaosMode, setChaosMode] = useState(false);
   const [bugsEnabled, setBugsEnabled] = useState(true);
-  const [drunkMode, setDrunkMode] = useState(false);
   const [bookmarks, setBookmarks] = useState<Article[]>([]);
   const [reactions, setReactions] = useState<{ [articleId: string]: string }>({});
 
@@ -182,8 +179,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setChaosMode,
       bugsEnabled,
       setBugsEnabled,
-      drunkMode,
-      setDrunkMode,
       bookmarks,
       addBookmark,
       removeBookmark,
