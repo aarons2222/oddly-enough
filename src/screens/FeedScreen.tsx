@@ -21,6 +21,7 @@ import { SkeletonCard } from '../components/SkeletonCard';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
 import { SettingsModal } from '../components/SettingsModal';
+import { DrunkEffect } from '../components/DrunkEffect';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 interface Props {
@@ -29,7 +30,7 @@ interface Props {
 }
 
 export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
-  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled } = useApp();
+  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled, drunkMode } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [articles, setArticles] = useState<Article[]>([]);
@@ -220,37 +221,39 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       {bugsEnabled && <ScreenBugs chaosMode={chaosMode} />}
-      {renderHeader()}
-      <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
-      
-      {loading ? (
-        <View style={styles.skeletonContainer}>
-          <SkeletonCard theme={theme} />
-          <SkeletonCard theme={theme} />
-          <SkeletonCard theme={theme} />
-        </View>
-      ) : (
-        <FlatList
-          data={articles}
-          renderItem={renderArticle}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor={theme.background}
-              colors={[theme.background]}
-              style={{ backgroundColor: theme.background }}
-              progressBackgroundColor={theme.background}
-            />
-          }
-          ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
-          ListEmptyComponent={renderEmpty}
-          ListFooterComponent={() => <View style={{ height: 80 }} />}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      <DrunkEffect enabled={drunkMode}>
+        {renderHeader()}
+        <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
+        
+        {loading ? (
+          <View style={styles.skeletonContainer}>
+            <SkeletonCard theme={theme} />
+            <SkeletonCard theme={theme} />
+            <SkeletonCard theme={theme} />
+          </View>
+        ) : (
+          <FlatList
+            data={articles}
+            renderItem={renderArticle}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={theme.background}
+                colors={[theme.background]}
+                style={{ backgroundColor: theme.background }}
+                progressBackgroundColor={theme.background}
+              />
+            }
+            ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
+            ListEmptyComponent={renderEmpty}
+            ListFooterComponent={() => <View style={{ height: 80 }} />}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </DrunkEffect>
       
       {/* Bottom Ad Banner */}
       <AdBanner style={styles.adBanner} />

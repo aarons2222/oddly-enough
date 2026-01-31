@@ -49,7 +49,7 @@ function FloatingEmoji({ emoji, delay, x, y }: { emoji: string; delay: number; x
 }
 
 export function SettingsModal({ visible, onClose }: Props) {
-  const { isDarkMode, toggleDarkMode, chaosMode, setChaosMode, bugsEnabled, setBugsEnabled } = useApp();
+  const { isDarkMode, toggleDarkMode, chaosMode, setChaosMode, bugsEnabled, setBugsEnabled, drunkMode, setDrunkMode } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   const insets = useSafeAreaInsets();
   
@@ -170,6 +170,28 @@ export function SettingsModal({ visible, onClose }: Props) {
               value={bugsEnabled}
               onValueChange={setBugsEnabled}
               trackColor={{ false: '#ccc', true: '#22C55E' }}
+              thumbColor="#fff"
+              ios_backgroundColor="#ccc"
+            />
+          </View>
+
+          {/* Drunk Mode Card */}
+          <View style={[styles.card, { backgroundColor: isDarkMode ? '#2e2e1a' : '#fff', borderColor: drunkMode ? '#F39C12' : (isDarkMode ? '#333' : '#ddd') }]}>
+            <View style={styles.cardIcon}>
+              <Text style={styles.cardEmoji}>🍺</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                Drunk Mode
+              </Text>
+              <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                The room is spinning...
+              </Text>
+            </View>
+            <Switch
+              value={drunkMode}
+              onValueChange={setDrunkMode}
+              trackColor={{ false: '#ccc', true: '#F39C12' }}
               thumbColor="#fff"
               ios_backgroundColor="#ccc"
             />
