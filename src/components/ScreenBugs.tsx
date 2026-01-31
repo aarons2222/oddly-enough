@@ -3,7 +3,7 @@ import { Animated, StyleSheet, Dimensions, Easing, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-const BUG_EMOJIS = ['🐛', '🐜', '🪲', '🪳', '🦗'];
+const BUG_EMOJIS = ['🐛', '🐜', '🪲', '🪳', '🦗', '🕷️', '🕷️', '🐜', '🐜', '🐜'];
 
 interface Bug {
   id: number;
@@ -18,47 +18,79 @@ function SingleBug({ bug, onComplete }: { bug: Bug; onComplete: () => void }) {
   const position = useRef(new Animated.ValueXY({ x: bug.startX, y: bug.startY })).current;
   const wiggle = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0)).current;
+  
+  const isSpider = bug.emoji === '🕷️';
+  const isAnt = bug.emoji === '🐜';
 
   useEffect(() => {
     // Pop in
     Animated.timing(scale, {
-      toValue: 1,
+      toValue: isSpider ? 1.3 : 1, // Spiders are bigger
       duration: 150,
       useNativeDriver: true,
     }).start();
 
-    // Wiggle while moving
+    // Different wiggle speeds
+    const wiggleDuration = isAnt ? 30 : isSpider ? 80 : 50;
     Animated.loop(
       Animated.sequence([
         Animated.timing(wiggle, {
           toValue: 1,
-          duration: 50,
+          duration: wiggleDuration,
           useNativeDriver: true,
         }),
         Animated.timing(wiggle, {
           toValue: -1,
-          duration: 50,
+          duration: wiggleDuration,
           useNativeDriver: true,
         }),
       ])
     ).start();
 
-    // Scurry across with slight randomness
-    const duration = 2000 + Math.random() * 1500;
-    
-    Animated.timing(position, {
-      toValue: { x: bug.endX, y: bug.endY },
-      duration,
-      easing: Easing.inOut(Easing.quad),
-      useNativeDriver: true,
-    }).start(() => {
-      // Pop out
-      Animated.timing(scale, {
-        toValue: 0,
-        duration: 100,
+    // Different movement patterns
+    if (isSpider) {
+      // Spiders: stop-start creepy movement
+      const midX = (bug.startX + bug.endX) / 2 + (Math.random() - 0.5) * 100;
+      const midY = (bug.startY + bug.endY) / 2 + (Math.random() - 0.5) * 100;
+      
+      Animated.sequence([
+        Animated.timing(position, {
+          toValue: { x: midX, y: midY },
+          duration: 800,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.delay(500 + Math.random() * 1000), // Creepy pause
+        Animated.timing(position, {
+          toValue: { x: bug.endX, y: bug.endY },
+          duration: 600,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        Animated.timing(scale, {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: true,
+        }).start(onComplete);
+      });
+    } else {
+      // Ants are fast, others are medium
+      const duration = isAnt ? 1200 + Math.random() * 800 : 2000 + Math.random() * 1500;
+      
+      Animated.timing(position, {
+        toValue: { x: bug.endX, y: bug.endY },
+        duration,
+        easing: isAnt ? Easing.linear : Easing.inOut(Easing.quad),
         useNativeDriver: true,
-      }).start(onComplete);
-    });
+      }).start(() => {
+        Animated.timing(scale, {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: true,
+        }).start(onComplete);
+      });
+    }
   }, []);
 
   const rotate = wiggle.interpolate({
