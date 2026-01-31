@@ -238,14 +238,11 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
           renderItem={renderArticle}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={false}
-              onRefresh={handleRefresh}
-              tintColor="transparent"
-              colors={['transparent']}
-            />
-          }
+          onScrollEndDrag={(e) => {
+            if (e.nativeEvent.contentOffset.y < -80 && !refreshing) {
+              handleRefresh();
+            }
+          }}
           ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
           ListEmptyComponent={renderEmpty}
           ListFooterComponent={() => <View style={{ height: 80 }} />}
