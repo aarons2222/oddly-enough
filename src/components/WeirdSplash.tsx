@@ -193,13 +193,6 @@ export function WeirdSplash({ onFinish }: Props) {
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* Bugs scurrying across */}
-      <ScreenBugs chaosMode={true} />
-      
-      {/* Floating emojis */}
-      {floatingEmojis.map((props, i) => (
-        <FloatingEmoji key={i} {...props} />
-      ))}
 
       {/* Glitch layer (behind) */}
       <Animated.Text
@@ -247,20 +240,6 @@ export function WeirdSplash({ onFinish }: Props) {
       <Animated.Text style={[styles.subtitle, { opacity: subtitleOpacity }]}>
         🛸 News from the weird side 👽
       </Animated.Text>
-
-      {/* Weird decorative elements */}
-      <View style={styles.cornerTL}>
-        <Text style={styles.cornerEmoji}>🌀</Text>
-      </View>
-      <View style={styles.cornerTR}>
-        <Text style={styles.cornerEmoji}>👁️</Text>
-      </View>
-      <View style={styles.cornerBL}>
-        <Text style={styles.cornerEmoji}>🎪</Text>
-      </View>
-      <View style={styles.cornerBR}>
-        <Text style={styles.cornerEmoji}>🔮</Text>
-      </View>
     </Animated.View>
   );
 }
