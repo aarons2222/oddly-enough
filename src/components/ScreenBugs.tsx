@@ -175,9 +175,9 @@ export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
     };
 
     // Settings based on mode
-    const initialDelay = chaosMode ? 1000 : 25000 + Math.random() * 20000; // Normal: 25-45s first bug
-    const spawnInterval = chaosMode ? 2000 + Math.random() * 2000 : 40000 + Math.random() * 30000; // Normal: 40-70s between
-    const spawnChance = chaosMode ? 0.9 : 0.25; // Normal: 25% chance
+    const initialDelay = chaosMode ? 1000 : 20000 + Math.random() * 10000; // Normal: 20-30s first bug
+    const spawnInterval = chaosMode ? 2000 + Math.random() * 2000 : 20000 + Math.random() * 10000; // Normal: 20-30s between
+    const spawnChance = chaosMode ? 0.9 : 1.0; // Normal: always spawn (but limited to 1)
     const maxBugs = chaosMode ? 10 : 1; // Normal: only 1 bug at a time!
     
     const trySpawnBug = () => {
