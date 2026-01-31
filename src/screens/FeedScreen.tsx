@@ -229,6 +229,10 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
               refreshing={refreshing}
               onRefresh={handleRefresh}
               tintColor="transparent"
+              colors={['transparent']}
+              style={{ backgroundColor: 'transparent', opacity: 0 }}
+              progressBackgroundColor="transparent"
+              progressViewOffset={-1000}
             />
           }
           ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
