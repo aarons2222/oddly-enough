@@ -168,17 +168,26 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     setCategory(newCategory);
   };
 
-  const renderArticle = ({ item, index }: { item: Article; index: number }) => (
-    <AnimatedCard index={index}>
-      <ArticleCard
-        article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
-        onPress={() => handleArticlePress(item)}
-        onBookmark={() => handleBookmark(item)}
-        onReact={(emoji) => setReaction(item.id, emoji)}
-        theme={theme}
-      />
-    </AnimatedCard>
-  );
+  const renderArticle = ({ item, index }: { item: Article; index: number }) => {
+    // Chaos mode: random slight rotation for each card
+    const chaosRotation = chaosMode ? (Math.sin(index * 1.5) * 2) : 0;
+    const chaosScale = chaosMode ? (0.98 + Math.cos(index * 2) * 0.02) : 1;
+    
+    return (
+      <AnimatedCard index={index}>
+        <View style={{ transform: [{ rotate: `${chaosRotation}deg` }, { scale: chaosScale }] }}>
+          <ArticleCard
+            article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
+            onPress={() => handleArticlePress(item)}
+            onBookmark={() => handleBookmark(item)}
+            onReact={(emoji) => setReaction(item.id, emoji)}
+            theme={theme}
+            chaosMode={chaosMode}
+          />
+        </View>
+      </AnimatedCard>
+    );
+  };
 
   const renderHeader = () => (
     <View style={[styles.header, { backgroundColor: theme.card }]}>

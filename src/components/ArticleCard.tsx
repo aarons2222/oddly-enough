@@ -20,12 +20,22 @@ interface Props {
   onBookmark?: () => void;
   onReact?: (emoji: string) => void;
   theme?: Theme;
+  chaosMode?: boolean;
 }
 
-export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme }: Props) {
+// Chaos fonts
+const CHAOS_FONTS = ['normal', 'italic'];
+
+export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false }: Props) {
   const [imageError, setImageError] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const categoryInfo = CATEGORIES.find(c => c.id === article.category);
+  
+  // Chaos effects based on article id hash
+  const chaosHash = article.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const chaosFontStyle = chaosMode && chaosHash % 7 === 0 ? 'italic' : 'normal';
+  const chaosTextColor = chaosMode && chaosHash % 11 === 0 ? '#FF6B6B' : theme.text;
+  const chaosBorderColor = chaosMode && chaosHash % 5 === 0 ? ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3'][chaosHash % 4] : 'transparent';
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -112,7 +122,12 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
       <Animated.View 
         style={[
           styles.card, 
-          { backgroundColor: theme.card, transform: [{ scale: scaleAnim }] }
+          { 
+            backgroundColor: theme.card, 
+            transform: [{ scale: scaleAnim }],
+            borderWidth: chaosMode ? 2 : 0,
+            borderColor: chaosBorderColor,
+          }
         ]}
       >
       {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
@@ -145,7 +160,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           <Text style={[styles.time, { color: theme.textMuted }]}>{timeAgo}</Text>
         </View>
         
-        <Text style={[styles.title, { color: theme.text }]} numberOfLines={3}>
+        <Text style={[styles.title, { color: chaosTextColor, fontStyle: chaosFontStyle }]} numberOfLines={3}>
           {article.title}
         </Text>
         
