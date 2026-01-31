@@ -240,12 +240,10 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
-              refreshing={refreshing}
+              refreshing={false}
               onRefresh={handleRefresh}
               tintColor="transparent"
               colors={['transparent']}
-              style={{ backgroundColor: 'transparent', height: 0, opacity: 0 }}
-              progressBackgroundColor="transparent"
             />
           }
           ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
