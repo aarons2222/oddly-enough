@@ -29,7 +29,7 @@ interface Props {
 }
 
 export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
-  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode } = useApp();
+  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [articles, setArticles] = useState<Article[]>([]);
@@ -210,7 +210,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
-      <ScreenBugs chaosMode={chaosMode} />
+      {bugsEnabled && <ScreenBugs chaosMode={chaosMode} />}
       {renderHeader()}
       <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
       

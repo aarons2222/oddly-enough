@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function SettingsModal({ visible, onClose }: Props) {
-  const { isDarkMode, toggleDarkMode, chaosMode, setChaosMode } = useApp();
+  const { isDarkMode, toggleDarkMode, chaosMode, setChaosMode, bugsEnabled, setBugsEnabled } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   const insets = useSafeAreaInsets();
 
@@ -65,6 +65,27 @@ export function SettingsModal({ visible, onClose }: Props) {
                 value={isDarkMode}
                 onValueChange={toggleDarkMode}
                 trackColor={{ false: '#767577', true: '#FF6B6B' }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            {/* Bugs Toggle */}
+            <View style={[styles.settingRow, { borderBottomColor: theme.border }]}>
+              <View style={styles.settingLeft}>
+                <View style={[styles.iconContainer, { backgroundColor: '#1a3d1a' }]}>
+                  <Text style={styles.iconEmoji}>🐛</Text>
+                </View>
+                <View>
+                  <Text style={[styles.settingLabel, { color: theme.text }]}>Screen Bugs</Text>
+                  <Text style={[styles.settingDesc, { color: theme.textMuted }]}>
+                    Creepy crawlies
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={bugsEnabled}
+                onValueChange={setBugsEnabled}
+                trackColor={{ false: '#767577', true: '#27AE60' }}
                 thumbColor="#fff"
               />
             </View>

@@ -16,6 +16,8 @@ interface AppContextType {
   fontScale: number;
   chaosMode: boolean;
   setChaosMode: (enabled: boolean) => void;
+  bugsEnabled: boolean;
+  setBugsEnabled: (enabled: boolean) => void;
   bookmarks: Article[];
   addBookmark: (article: Article) => void;
   removeBookmark: (articleId: string) => void;
@@ -38,6 +40,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [darkModePreference, setDarkModePrefState] = useState<DarkModePreference>('light');
   const [fontSize, setFontSizeState] = useState<FontSize>('medium');
   const [chaosMode, setChaosMode] = useState(false);
+  const [bugsEnabled, setBugsEnabled] = useState(true);
   const [bookmarks, setBookmarks] = useState<Article[]>([]);
   const [reactions, setReactions] = useState<{ [articleId: string]: string }>({});
 
@@ -174,6 +177,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       fontScale,
       chaosMode,
       setChaosMode,
+      bugsEnabled,
+      setBugsEnabled,
       bookmarks,
       addBookmark,
       removeBookmark,
