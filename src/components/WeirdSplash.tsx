@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 import { ScreenBugs } from './ScreenBugs';
+import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -88,6 +89,8 @@ interface Props {
 }
 
 export function WeirdSplash({ onFinish }: Props) {
+  const { isDarkMode } = useApp();
+  const theme = isDarkMode ? darkTheme : lightTheme;
   const titleScale = useRef(new Animated.Value(0)).current;
   const titleRotate = useRef(new Animated.Value(0)).current;
   const subtitleOpacity = useRef(new Animated.Value(0)).current;
@@ -188,7 +191,7 @@ export function WeirdSplash({ onFinish }: Props) {
 
   const bgColor = bgPulse.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#0a0a0a', '#151515'],
+    outputRange: isDarkMode ? ['#0a0a0a', '#151515'] : ['#FAFAFA', '#F0F0F0'],
   });
 
   return (
@@ -229,6 +232,7 @@ export function WeirdSplash({ onFinish }: Props) {
         style={[
           styles.title,
           {
+            color: theme.text,
             transform: [{ scale: titleScale }, { rotate: spin }],
           },
         ]}
@@ -237,7 +241,7 @@ export function WeirdSplash({ onFinish }: Props) {
       </Animated.Text>
 
       {/* Subtitle */}
-      <Animated.Text style={[styles.subtitle, { opacity: subtitleOpacity }]}>
+      <Animated.Text style={[styles.subtitle, { opacity: subtitleOpacity, color: theme.textMuted }]}>
         🛸 News from the weird side 👽
       </Animated.Text>
     </Animated.View>

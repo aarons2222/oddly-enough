@@ -147,10 +147,10 @@ export function SettingsModal({ visible, onClose }: Props) {
             </View>
             <View style={styles.cardContent}>
               <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
-                {isDarkMode ? 'Dark Side' : 'Light Side'}
+                {!isDarkMode ? 'Dark Side' : 'Light Side'}
               </Text>
               <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
-                {isDarkMode ? 'Embrace the darkness' : 'Let there be light'}
+                {!isDarkMode ? 'Embrace the darkness' : 'Let there be light'}
               </Text>
             </View>
             <Switch

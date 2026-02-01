@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1290px;
+      height: 2796px;
+      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stars {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, white, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, white, transparent),
+        radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 230px 80px, white, transparent),
+        radial-gradient(2px 2px at 300px 200px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 400px 150px, white, transparent),
+        radial-gradient(2px 2px at 500px 250px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 600px 100px, white, transparent),
+        radial-gradient(2px 2px at 700px 300px, white, transparent),
+        radial-gradient(1px 1px at 800px 180px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 900px 350px, white, transparent),
+        radial-gradient(1px 1px at 1000px 200px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(2px 2px at 1100px 400px, white, transparent),
+        radial-gradient(1px 1px at 1200px 150px, rgba(255,255,255,0.8), transparent);
+    }
+    .ufo {
+      position: absolute;
+      top: 80px;
+      right: 120px;
+      font-size: 100px;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-30px) rotate(5deg); }
+    }
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+    .tagline {
+      font-size: 64px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+      margin-bottom: 50px;
+      line-height: 1.3;
+    }
+    .tagline-accent { color: #FF6B6B; }
+    .phone-frame {
+      width: 750px;
+      height: 1530px;
+      background: #1a1a1a;
+      border-radius: 80px;
+      border: 12px solid #333;
+      padding: 20px;
+      box-shadow: 0 80px 150px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+      border-radius: 60px;
+      padding: 40px 25px;
+      overflow: hidden;
+    }
+    .phone-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .phone-logo { font-size: 52px; font-weight: 800; }
+    .card {
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .card-category {
+      font-size: 18px;
+      color: #FF6B6B;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 28px;
+      color: white;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .card-meta {
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 16px;
+    }
+    .bugs {
+      position: absolute;
+      bottom: 300px;
+      left: 100px;
+      font-size: 50px;
+      transform: rotate(45deg);
+    }
+    .bug2 {
+      position: absolute;
+      top: 400px;
+      left: 80px;
+      font-size: 35px;
+      transform: rotate(-30deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="ufo">🛸</div>
+  <div class="bugs">🪲</div>
+  <div class="bug2">🐛</div>
+  
+  <div class="content">
+    <div class="tagline">
+      The world is <span class="tagline-accent">weird</span>.<br>
+      Stay informed.
+    </div>
+    
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-header">
+          <span class="phone-logo"><span style="color:white">Oddly</span><span style="color:#FF6B6B">Enough</span></span>
+        </div>
+        <div class="card">
+          <div class="card-category">🔬 SCIENCE</div>
+          <div class="card-title">Scientists Discover New Species That Communicates Through Dance</div>
+          <div class="card-meta">2 hours ago</div>
+        </div>
+        <div class="card">
+          <div class="card-category">🌍 WORLD</div>
+          <div class="card-title">Town Elects Dog as Mayor for Third Consecutive Term</div>
+          <div class="card-meta">5 hours ago</div>
+        </div>
+        <div class="card">
+          <div class="card-category">🎭 CULTURE</div>
+          <div class="card-title">Museum Opens Exhibit Dedicated to Socks Lost in Dryers</div>
+          <div class="card-meta">8 hours ago</div>
+        </div>
+        <div class="card">
+          <div class="card-category">🔬 SCIENCE</div>
+          <div class="card-title">AI Writes Novel, Critics Say It's "Surprisingly Mediocre"</div>
+          <div class="card-meta">12 hours ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

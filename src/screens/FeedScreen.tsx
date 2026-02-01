@@ -13,8 +13,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Article, Category } from '../types/Article';
 import { fetchArticles, refreshArticles } from '../services/newsService';
 import { preloadArticleContent } from '../services/contentCache';
+import { fetchStats, trackEvent, ArticleStats } from '../services/statsService';
 import { ArticleCard } from '../components/ArticleCard';
-import { CategoryFilter } from '../components/CategoryFilter';
+import { CategoryFilter, SortOption } from '../components/CategoryFilter';
 import { AdBanner } from '../components/AdBanner';
 import { AnimatedCard } from '../components/AnimatedCard';
 import { SkeletonCard } from '../components/SkeletonCard';
@@ -38,6 +39,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [category, setCategory] = useState<Category>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [articleStats, setArticleStats] = useState<Record<string, ArticleStats>>({});
 
   // Deduplicate articles by similar titles or same URL
   const deduplicateArticles = (articles: Article[]): Article[] => {
@@ -75,6 +78,32 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
 
   const [availableCategories, setAvailableCategories] = useState<Category[]>(['all']);
 
+  // Sort articles based on current sort option
+  const sortArticles = useCallback((articles: Article[], stats: Record<string, ArticleStats> = {}) => {
+    return [...articles].sort((a, b) => {
+      // Group by category when showing all
+      if (category === 'all' && a.category !== b.category) {
+        return a.category.localeCompare(b.category);
+      }
+      
+      switch (sortBy) {
+        case 'trending': {
+          const aStats = stats[a.id];
+          const bStats = stats[b.id];
+          const aTotal = aStats ? Object.values(aStats.reactions).reduce((sum, n) => sum + n, 0) : 0;
+          const bTotal = bStats ? Object.values(bStats.reactions).reduce((sum, n) => sum + n, 0) : 0;
+          if (bTotal !== aTotal) return bTotal - aTotal;
+          return b.publishedAt.getTime() - a.publishedAt.getTime();
+        }
+        case 'oldest':
+          return a.publishedAt.getTime() - b.publishedAt.getTime();
+        case 'newest':
+        default:
+          return b.publishedAt.getTime() - a.publishedAt.getTime();
+      }
+    });
+  }, [category, sortBy]);
+
   const loadArticles = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
@@ -89,21 +118,24 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
       
-      // Filter for selected category, then dedupe again and sort
+      // Filter for selected category, then dedupe again
       const filtered = category === 'all' 
         ? uniqueAll 
         : uniqueAll.filter(a => a.category === category);
       
-      // Sort: group by category (when showing all), then newest first within each
-      const uniqueArticles = deduplicateArticles(filtered)
-        .sort((a, b) => {
-          if (category === 'all' && a.category !== b.category) {
-            return a.category.localeCompare(b.category);
-          }
-          return b.publishedAt.getTime() - a.publishedAt.getTime();
-        });
+      const uniqueArticles = deduplicateArticles(filtered);
       
-      setArticles(uniqueArticles);
+      // Fetch social proof stats for articles
+      const articleIds = uniqueArticles.map(a => a.id);
+      console.log('Fetching stats for:', articleIds.slice(0, 5));
+      const stats = await fetchStats(articleIds);
+      console.log('Got stats:', stats);
+      setArticleStats(stats);
+      
+      // Store raw articles for re-sorting, and sort for display
+      setRawArticles(uniqueArticles);
+      const sortedArticles = sortArticles(uniqueArticles, stats);
+      setArticles(sortedArticles);
       
       // Preload ALL article content in background
       const urlsToPreload = uniqueArticles.map(a => a.url);
@@ -114,11 +146,21 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [category]);
+  }, [category, sortArticles]);
 
   useEffect(() => {
     loadArticles();
   }, [loadArticles]);
+
+  // Re-sort when sort option changes (without refetching)
+  const [rawArticles, setRawArticles] = useState<Article[]>([]);
+  
+  useEffect(() => {
+    if (rawArticles.length > 0) {
+      const sorted = sortArticles(rawArticles, articleStats);
+      setArticles(sorted);
+    }
+  }, [sortBy, rawArticles, articleStats, sortArticles]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -128,20 +170,22 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       const filtered = category === 'all' 
         ? freshArticles 
         : freshArticles.filter(a => a.category === category);
-      // Sort: group by category (when showing all), then newest first within each
-      const uniqueArticles = deduplicateArticles(filtered)
-        .sort((a, b) => {
-          if (category === 'all' && a.category !== b.category) {
-            return a.category.localeCompare(b.category);
-          }
-          return b.publishedAt.getTime() - a.publishedAt.getTime();
-        });
-      setArticles(uniqueArticles);
+      const uniqueArticles = deduplicateArticles(filtered);
       
       // Update available categories
       const categoriesWithArticles = new Set<Category>(['all']);
       freshArticles.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
+      
+      // Fetch stats and sort
+      const articleIds = uniqueArticles.map(a => a.id);
+      const stats = await fetchStats(articleIds);
+      setArticleStats(stats);
+      
+      // Store raw articles for re-sorting
+      setRawArticles(uniqueArticles);
+      const sortedArticles = sortArticles(uniqueArticles, stats);
+      setArticles(sortedArticles);
       
       // Preload content
       const urlsToPreload = uniqueArticles.map(a => a.url);
@@ -154,6 +198,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   };
 
   const handleArticlePress = (article: Article) => {
+    // Track view for social proof
+    trackEvent(article.id, 'view');
     onArticleSelect(article);
   };
 
@@ -165,6 +211,12 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     }
   };
 
+  const handleReaction = (articleId: string, emoji: '🤯' | '😂' | '🤮') => {
+    // Track reaction for social proof
+    trackEvent(articleId, 'reaction', emoji);
+    setReaction(articleId, emoji);
+  };
+
   const handleCategoryChange = (newCategory: Category) => {
     setCategory(newCategory);
   };
@@ -173,6 +225,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     // Chaos mode: random slight rotation for each card
     const chaosRotation = chaosMode ? (Math.sin(index * 1.5) * 2) : 0;
     const chaosScale = chaosMode ? (0.98 + Math.cos(index * 2) * 0.02) : 1;
+    const stats = articleStats[item.id];
     
     return (
       <AnimatedCard index={index}>
@@ -182,9 +235,10 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
               article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
               onPress={() => handleArticlePress(item)}
               onBookmark={() => handleBookmark(item)}
-              onReact={(emoji) => setReaction(item.id, emoji)}
+              onReact={(emoji) => handleReaction(item.id, emoji as '🤯' | '😂' | '🤮')}
               theme={theme}
               chaosMode={chaosMode}
+              stats={stats}
             />
           </View>
         </UfoAbduction>
@@ -224,7 +278,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       {bugsEnabled && <ScreenBugs chaosMode={chaosMode} />}
       {renderHeader()}
-      <CategoryFilter selected={category} onSelect={handleCategoryChange} theme={theme} availableCategories={availableCategories} />
+      <CategoryFilter 
+        selected={category} 
+        onSelect={handleCategoryChange} 
+        theme={theme} 
+        availableCategories={availableCategories}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
       
       {loading ? (
         <View style={styles.skeletonContainer}>

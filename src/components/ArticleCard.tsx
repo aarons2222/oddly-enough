@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Article, CATEGORIES } from '../types/Article';
 import { formatDistanceToNow } from 'date-fns';
 import { Theme, lightTheme } from '../context/AppContext';
+import { ArticleStats, formatViews, getDominantReaction } from '../services/statsService';
 
 interface Props {
   article: Article & { reaction?: string };
@@ -21,14 +22,17 @@ interface Props {
   onReact?: (emoji: string) => void;
   theme?: Theme;
   chaosMode?: boolean;
+  stats?: ArticleStats;
 }
 
 // Chaos fonts
 const CHAOS_FONTS = ['normal', 'italic'];
 
-export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false }: Props) {
+export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false, stats }: Props) {
   const [imageError, setImageError] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fabAnim = useRef(new Animated.Value(0)).current;
   const categoryInfo = CATEGORIES.find(c => c.id === article.category);
   
   // Chaos effects based on article id hash
@@ -50,6 +54,51 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
       friction: 3,
       useNativeDriver: true,
     }).start();
+  };
+
+  const toggleFab = () => {
+    const toValue = fabOpen ? 0 : 1;
+    setFabOpen(!fabOpen);
+    Animated.spring(fabAnim, {
+      toValue,
+      friction: 5,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // FAB button animations - horizontal row to the left
+  const fab1Style = {
+    transform: [
+      { scale: fabAnim },
+      { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
+    ],
+    opacity: fabAnim,
+  };
+  const fab2Style = {
+    transform: [
+      { scale: fabAnim },
+      { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -95] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
+    ],
+    opacity: fabAnim,
+  };
+  const fab3Style = {
+    transform: [
+      { scale: fabAnim },
+      { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -140] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
+    ],
+    opacity: fabAnim,
+  };
+  const fab4Style = {
+    transform: [
+      { scale: fabAnim },
+      { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -185] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
+    ],
+    opacity: fabAnim,
   };
   
   const handleShare = async () => {
@@ -130,22 +179,24 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           }
         ]}
       >
-      {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
-        <Image 
-          source={{ uri: article.imageUrl }} 
-          style={styles.image}
-          resizeMode="cover"
-          onError={() => setImageError(true)}
-        />
-      ) : null}
-      
-      {/* Always show placeholder behind image, visible when image fails or is loading */}
-      {(!article.imageUrl || imageError) && (
-        <View style={[styles.image, styles.placeholderImage]}>
-          <Text style={styles.placeholderEmoji}>{categoryInfo?.emoji || '📰'}</Text>
-          <Text style={[styles.placeholderText, { color: '#FF6B6B' }]}>{article.source}</Text>
-        </View>
-      )}
+      <View style={styles.imageContainer}>
+        {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
+          <Image 
+            source={{ uri: article.imageUrl }} 
+            style={styles.image}
+            resizeMode="cover"
+            onError={() => setImageError(true)}
+          />
+        ) : null}
+        
+        {/* Always show placeholder behind image, visible when image fails or is loading */}
+        {(!article.imageUrl || imageError) && (
+          <View style={[styles.image, styles.placeholderImage]}>
+            <Text style={styles.placeholderEmoji}>{categoryInfo?.emoji || '📰'}</Text>
+            <Text style={[styles.placeholderText, { color: '#FF6B6B' }]}>{article.source}</Text>
+          </View>
+        )}
+      </View>
       
       <View style={styles.content}>
         <View style={styles.meta}>
@@ -168,27 +219,69 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           {article.summary}
         </Text>
         
-        <View style={styles.actions}>
-          <View style={styles.reactions}>
+        {/* Stats Row - bottom left */}
+        <View style={styles.statsRow}>
+          {stats && (stats.reactions['🤯'] > 0 || stats.reactions['😂'] > 0 || stats.reactions['🤮'] > 0) ? (
+            <Text style={[styles.statsText, { color: theme.textMuted }]}>
+              {stats.reactions['🤯'] > 0 ? `${stats.reactions['🤯']} 🤯  ` : ''}
+              {stats.reactions['😂'] > 0 ? `${stats.reactions['😂']} 😂  ` : ''}
+              {stats.reactions['🤮'] > 0 ? `${stats.reactions['🤮']} 🤮` : ''}
+            </Text>
+          ) : (
+            <View />
+          )}
+        </View>
+        
+        {/* FAB Container */}
+        <View style={styles.fabContainer}>
+          {/* Expanded buttons */}
+          <Animated.View style={[styles.fabOption, fab1Style]}>
             <TouchableOpacity 
-              onPress={() => onReact?.('🤯')} 
-              style={[styles.reactionButton, article.reaction === '🤯' && styles.reactionActive]}
+              onPress={() => { onReact?.('🤯'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
             >
-              <Text style={styles.reactionEmoji}>🤯</Text>
+              <Text style={styles.fabEmoji}>🤯</Text>
             </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab2Style]}>
             <TouchableOpacity 
-              onPress={() => onReact?.('😂')} 
-              style={[styles.reactionButton, article.reaction === '😂' && styles.reactionActive]}
+              onPress={() => { onReact?.('😂'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
             >
-              <Text style={styles.reactionEmoji}>😂</Text>
+              <Text style={styles.fabEmoji}>😂</Text>
             </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab3Style]}>
             <TouchableOpacity 
-              onPress={() => onReact?.('🤮')} 
-              style={[styles.reactionButton, article.reaction === '🤮' && styles.reactionActive]}
+              onPress={() => { onReact?.('🤮'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
             >
-              <Text style={styles.reactionEmoji}>🤮</Text>
+              <Text style={styles.fabEmoji}>🤮</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab4Style]}>
+            <TouchableOpacity 
+              onPress={() => { onBookmark?.(); toggleFab(); }} 
+              style={styles.fabOptionButton}
+            >
+              <Ionicons 
+                name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
+                size={20} 
+                color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
+              />
+            </TouchableOpacity>
+          </Animated.View>
+          
+          {/* Main FAB button */}
+          <TouchableOpacity onPress={toggleFab} style={styles.fabMain}>
+            <Animated.View style={{ 
+              transform: [{ 
+                rotate: fabAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] }) 
+              }] 
+            }}>
+              <Ionicons name="add" size={28} color="#fff" />
+            </Animated.View>
+          </TouchableOpacity>
         </View>
       </View>
       </Animated.View>
@@ -201,12 +294,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 8,
-    overflow: 'hidden',
+    overflow: 'visible',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+  },
+  imageContainer: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
@@ -228,6 +326,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    position: 'relative',
   },
   meta: {
     flexDirection: 'row',
@@ -271,31 +370,68 @@ const styles = StyleSheet.create({
   summary: {
     fontSize: 14,
     lineHeight: 20,
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  actions: {
+  statsRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    gap: 12,
+    minHeight: 30,
+    marginBottom: 10,
   },
-  actionButton: {
-    padding: 8,
+  statsText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
-  reactions: {
-    flexDirection: 'row',
-    gap: 4,
+  fabContainer: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
   },
-  reactionButton: {
-    padding: 6,
+  fabMain: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FF6B6B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  fabOption: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    zIndex: 10,
+  },
+  fabOptionButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    opacity: 0.5,
+    backgroundColor: '#4ECDC4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
   },
-  reactionActive: {
-    opacity: 1,
-    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+  fabOptionActive: {
+    backgroundColor: '#FF6B6B',
   },
-  reactionEmoji: {
+  fabEmoji: {
     fontSize: 20,
+    lineHeight: 24,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
   },
 });

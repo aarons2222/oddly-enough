@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oddly Enough",
     "slug": "oddly-enough",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -13,8 +13,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oddlyenough.app",
+      "bundleIdentifier": "uk.co.flatwhite.oddly",
       "backgroundColor": "#121212",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -39,7 +40,15 @@
       "startUrl": "/",
       "scope": "/"
     },
-    "plugins": [],
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713"
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "4ec857a3-ead4-4d5c-8889-2b63f549affe"

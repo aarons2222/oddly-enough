@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1290px;
+      height: 2796px;
+      background: linear-gradient(180deg, #FF6B6B 0%, #FF8E8E 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+      position: relative;
+    }
+    .headline {
+      font-size: 72px;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .subheadline {
+      font-size: 38px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .phone-frame {
+      width: 750px;
+      height: 1530px;
+      background: #0a0a0a;
+      border-radius: 80px;
+      border: 12px solid #333;
+      padding: 20px;
+      box-shadow: 0 80px 150px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+      border-radius: 60px;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 50px 35px 25px 35px;
+      background: #1a1a1a;
+    }
+    .header-icon { font-size: 32px; color: white; }
+    .logo { font-size: 48px; font-weight: 800; }
+    .logo-white { color: white; }
+    .logo-coral { color: #FF6B6B; }
+    .categories {
+      display: flex;
+      gap: 14px;
+      padding: 25px 35px;
+      background: #1a1a1a;
+    }
+    .cat-pill {
+      padding: 14px 28px;
+      border-radius: 30px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .cat-active { background: #FF6B6B; color: white; }
+    .cat-inactive { background: #2a2a2a; color: rgba(255,255,255,0.7); }
+    .feed { padding: 25px; }
+    .card {
+      background: #1e1e1e;
+      border-radius: 24px;
+      overflow: hidden;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .card-image {
+      height: 200px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-image-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .card-image-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .card-emoji { font-size: 90px; }
+    .card-content { padding: 28px; }
+    .card-category {
+      font-size: 17px;
+      color: #FF6B6B;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 26px;
+      color: white;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .card-time { font-size: 16px; color: rgba(255,255,255,0.5); }
+    .card-actions { display: flex; gap: 16px; font-size: 24px; }
+    .floating-emoji {
+      position: absolute;
+      font-size: 80px;
+      opacity: 0.15;
+    }
+    .emoji-1 { top: 150px; right: 80px; transform: rotate(15deg); }
+    .emoji-2 { bottom: 300px; left: 60px; transform: rotate(-20deg); }
+  </style>
+</head>
+<body>
+  <div class="floating-emoji emoji-1">📰</div>
+  <div class="floating-emoji emoji-2">🗞️</div>
+  
+  <div class="headline">Curated Weirdness</div>
+  <div class="subheadline">Strange stories from around the globe</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="header">
+        <span class="header-icon">🔖</span>
+        <div class="logo">
+          <span class="logo-white">Oddly</span><span class="logo-coral">Enough</span>
+        </div>
+        <span class="header-icon">⚙️</span>
+      </div>
+      
+      <div class="categories">
+        <span class="cat-pill cat-active">All</span>
+        <span class="cat-pill cat-inactive">🔬 Science</span>
+        <span class="cat-pill cat-inactive">🌍 World</span>
+        <span class="cat-pill cat-inactive">🎭 Culture</span>
+      </div>
+      
+      <div class="feed">
+        <div class="card">
+          <div class="card-image">
+            <span class="card-emoji">🦑</span>
+          </div>
+          <div class="card-content">
+            <div class="card-category">🔬 SCIENCE</div>
+            <div class="card-title">Giant Squid Found With Tiny Top Hat, Baffles Scientists</div>
+            <div class="card-meta">
+              <span class="card-time">2 hours ago</span>
+              <div class="card-actions">
+                <span>😂</span>
+                <span>🔖</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-image card-image-2">
+            <span class="card-emoji">🏛️</span>
+          </div>
+          <div class="card-content">
+            <div class="card-category">🌍 WORLD</div>
+            <div class="card-title">Ancient Roman Graffiti: "Brutus Was Here"</div>
+            <div class="card-meta">
+              <span class="card-time">5 hours ago</span>
+              <div class="card-actions">
+                <span>🤯</span>
+                <span>🔖</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1290px;
+      height: 2796px;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+      position: relative;
+    }
+    .headline {
+      font-size: 72px;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .subheadline {
+      font-size: 38px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .accent { color: #fbbf24; }
+    .phone-frame {
+      width: 750px;
+      height: 1530px;
+      background: #0a0a0a;
+      border-radius: 80px;
+      border: 12px solid #333;
+      padding: 20px;
+      box-shadow: 0 80px 150px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+      border-radius: 60px;
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 50px 35px 35px 35px;
+      background: #1a1a1a;
+    }
+    .back-btn { font-size: 32px; color: white; }
+    .header-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header-icon { font-size: 32px; }
+    .placeholder { width: 32px; }
+    .bookmarks-list { padding: 35px 25px; }
+    .bookmark-card {
+      background: #1e1e1e;
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 22px;
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .bookmark-emoji {
+      font-size: 55px;
+      width: 95px;
+      height: 95px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .bookmark-emoji-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .bookmark-emoji-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .bookmark-emoji-4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .bookmark-emoji-5 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+    .bookmark-content { flex: 1; }
+    .bookmark-category {
+      font-size: 15px;
+      color: #FF6B6B;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    .bookmark-title {
+      font-size: 24px;
+      color: white;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .bookmark-time {
+      font-size: 16px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 12px;
+    }
+    .bookmark-action { font-size: 32px; padding: 12px; }
+    .floating-emoji {
+      position: absolute;
+      font-size: 80px;
+      opacity: 0.1;
+    }
+    .e1 { top: 180px; right: 80px; transform: rotate(10deg); }
+    .e2 { bottom: 350px; left: 60px; transform: rotate(-15deg); }
+  </style>
+</head>
+<body>
+  <div class="floating-emoji e1">🔖</div>
+  <div class="floating-emoji e2">💾</div>
+  
+  <div class="headline">Save the <span class="accent">Weird</span></div>
+  <div class="subheadline">Bookmark your favorite stories</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="header">
+        <span class="back-btn">←</span>
+        <div class="header-title">
+          <span class="header-icon">🔖</span>
+          Bookmarks
+        </div>
+        <div class="placeholder"></div>
+      </div>
+      
+      <div class="bookmarks-list">
+        <div class="bookmark-card">
+          <div class="bookmark-emoji">🦑</div>
+          <div class="bookmark-content">
+            <div class="bookmark-category">🔬 SCIENCE</div>
+            <div class="bookmark-title">Giant Squid Found With Tiny Top Hat</div>
+            <div class="bookmark-time">Saved 2 hours ago</div>
+          </div>
+          <div class="bookmark-action">🔖</div>
+        </div>
+        
+        <div class="bookmark-card">
+          <div class="bookmark-emoji bookmark-emoji-2">🏛️</div>
+          <div class="bookmark-content">
+            <div class="bookmark-category">🌍 WORLD</div>
+            <div class="bookmark-title">Ancient Roman Graffiti: "Brutus Was Here"</div>
+            <div class="bookmark-time">Saved yesterday</div>
+          </div>
+          <div class="bookmark-action">🔖</div>
+        </div>
+        
+        <div class="bookmark-card">
+          <div class="bookmark-emoji bookmark-emoji-3">🎸</div>
+          <div class="bookmark-content">
+            <div class="bookmark-category">🎭 CULTURE</div>
+            <div class="bookmark-title">Cat's Meowing Goes Viral as "Song of Year"</div>
+            <div class="bookmark-time">Saved 3 days ago</div>
+          </div>
+          <div class="bookmark-action">🔖</div>
+        </div>
+        
+        <div class="bookmark-card">
+          <div class="bookmark-emoji bookmark-emoji-4">🍕</div>
+          <div class="bookmark-content">
+            <div class="bookmark-category">🔬 SCIENCE</div>
+            <div class="bookmark-title">Pizza Contains New Element: Deliciousium</div>
+            <div class="bookmark-time">Saved last week</div>
+          </div>
+          <div class="bookmark-action">🔖</div>
+        </div>
+        
+        <div class="bookmark-card">
+          <div class="bookmark-emoji bookmark-emoji-5">🐙</div>
+          <div class="bookmark-content">
+            <div class="bookmark-category">🔬 SCIENCE</div>
+            <div class="bookmark-title">Octopus Escapes Tank, Returns with Gift</div>
+            <div class="bookmark-time">Saved 2 weeks ago</div>
+          </div>
+          <div class="bookmark-action">🔖</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

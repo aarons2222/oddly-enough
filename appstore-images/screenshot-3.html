@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1290px;
+      height: 2796px;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+      position: relative;
+    }
+    .headline {
+      font-size: 72px;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .subheadline {
+      font-size: 38px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .accent { color: #FF6B6B; }
+    .phone-frame {
+      width: 750px;
+      height: 1530px;
+      background: #0a0a0a;
+      border-radius: 80px;
+      border: 12px solid #333;
+      padding: 20px;
+      box-shadow: 0 80px 150px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #121212;
+      border-radius: 60px;
+      overflow: hidden;
+    }
+    .article-image {
+      height: 480px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .article-emoji { font-size: 180px; }
+    .back-btn {
+      position: absolute;
+      top: 55px;
+      left: 30px;
+      width: 55px;
+      height: 55px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 32px;
+    }
+    .share-btn {
+      position: absolute;
+      top: 55px;
+      right: 30px;
+      width: 55px;
+      height: 55px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .article-content { padding: 40px 35px; }
+    .article-category {
+      font-size: 18px;
+      color: #FF6B6B;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .article-title {
+      font-size: 38px;
+      color: white;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 25px;
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 35px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .meta-item { font-size: 18px; color: rgba(255,255,255,0.5); }
+    .article-body {
+      font-size: 22px;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.7;
+    }
+    .reactions {
+      display: flex;
+      gap: 18px;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .reaction {
+      padding: 16px 28px;
+      background: #1e1e1e;
+      border-radius: 35px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .reaction-count { font-size: 20px; color: white; font-weight: 600; }
+    .stars {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        radial-gradient(2px 2px at 100px 200px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 300px 400px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 500px 100px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 700px 600px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(2px 2px at 900px 300px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(1px 1px at 1100px 500px, rgba(255,255,255,0.4), transparent);
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  
+  <div class="headline">Dive <span class="accent">Deep</span></div>
+  <div class="subheadline">Full articles, beautifully presented</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="article-image">
+        <div class="back-btn">←</div>
+        <div class="share-btn">↗️</div>
+        <span class="article-emoji">🦑</span>
+      </div>
+      
+      <div class="article-content">
+        <div class="article-category">🔬 SCIENCE</div>
+        <div class="article-title">Giant Squid Found Wearing Tiny Top Hat</div>
+        
+        <div class="article-meta">
+          <span class="meta-item">📰 BBC News</span>
+          <span class="meta-item">⏱️ 3 min read</span>
+        </div>
+        
+        <div class="article-body">
+          Marine biologists off the coast of Japan made an unprecedented discovery yesterday when they captured footage of a giant squid apparently wearing what appears to be a miniature Victorian-era top hat...
+        </div>
+        
+        <div class="reactions">
+          <div class="reaction">
+            <span>😂</span>
+            <span class="reaction-count">247</span>
+          </div>
+          <div class="reaction">
+            <span>🤯</span>
+            <span class="reaction-count">189</span>
+          </div>
+          <div class="reaction">
+            <span>🔖</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

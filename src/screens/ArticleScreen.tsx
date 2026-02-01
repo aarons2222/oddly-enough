@@ -295,6 +295,48 @@ export function ArticleScreen({ article, onBack }: Props) {
       {/* Screen Bugs */}
       <ScreenBugs />
       
+      {/* Floating Back Button - Outside ScrollView */}
+      <Animated.View 
+        style={[
+          styles.floatingBackButton,
+          {
+            top: Math.max(insets.top, 20) + 8,
+            opacity: backButtonAnim,
+            transform: [{ translateX: backButtonTranslate }],
+          }
+        ]}
+      >
+        <TouchableOpacity 
+          onPress={onBack} 
+          style={styles.backButtonInner}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="arrow-back" size={20} color="#fff" />
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Floating Share Button - Outside ScrollView */}
+      <Animated.View 
+        style={[
+          styles.floatingShareButton,
+          {
+            top: Math.max(insets.top, 20) + 8,
+            opacity: backButtonAnim,
+            transform: [{ translateX: Animated.multiply(backButtonTranslate, -1) }],
+          }
+        ]}
+      >
+        <TouchableOpacity 
+          onPress={handleShare} 
+          style={styles.backButtonInner}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.backButtonText}>Share</Text>
+          <Ionicons name="share-outline" size={20} color="#fff" />
+        </TouchableOpacity>
+      </Animated.View>
+
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -332,48 +374,6 @@ export function ArticleScreen({ article, onBack }: Props) {
               { opacity: overlayOpacity }
             ]} 
           />
-
-          {/* Floating Back Button */}
-          <Animated.View 
-            style={[
-              styles.floatingBackButton,
-              {
-                top: Math.max(insets.top, 20) + 8,
-                opacity: backButtonAnim,
-                transform: [{ translateX: backButtonTranslate }],
-              }
-            ]}
-          >
-            <TouchableOpacity 
-              onPress={onBack} 
-              style={styles.backButtonInner}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="arrow-back" size={20} color="#fff" />
-              <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* Floating Share Button */}
-          <Animated.View 
-            style={[
-              styles.floatingShareButton,
-              {
-                top: Math.max(insets.top, 20) + 8,
-                opacity: backButtonAnim,
-                transform: [{ translateX: Animated.multiply(backButtonTranslate, -1) }],
-              }
-            ]}
-          >
-            <TouchableOpacity 
-              onPress={handleShare} 
-              style={styles.backButtonInner}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.backButtonText}>Share</Text>
-              <Ionicons name="share-outline" size={20} color="#fff" />
-            </TouchableOpacity>
-          </Animated.View>
 
           {/* Hero Content */}
           <View style={styles.heroContent}>
@@ -531,13 +531,13 @@ const styles = StyleSheet.create({
   floatingBackButton: {
     position: 'absolute',
     left: 20,
-    zIndex: 10,
+    zIndex: 100,
   },
   // Floating Share Button
   floatingShareButton: {
     position: 'absolute',
     right: 20,
-    zIndex: 10,
+    zIndex: 100,
   },
   backButtonInner: {
     flexDirection: 'row',
