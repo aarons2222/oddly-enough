@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CONTENT_CACHE_PREFIX = 'oddly_content_';
-const CONTENT_TTL = 60 * 60 * 1000; // 1 hour
+const CONTENT_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 interface CachedContent {
   content: string;

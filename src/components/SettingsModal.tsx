@@ -132,16 +132,16 @@ export function SettingsModal({ visible, onClose }: Props) {
 
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
-            <Ionicons name="close" size={20} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.placeholder} />
           
           <Animated.View style={[styles.logoContainer, { transform: [{ rotate: titleRotate }] }]}>
             <Text style={[styles.logo, { color: theme.text }]}>Weird</Text>
             <Text style={styles.logoAccent}>Settings</Text>
           </Animated.View>
           
-          <View style={styles.placeholder} />
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
+            <Ionicons name="close" size={20} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         {/* Settings Cards */}

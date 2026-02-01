@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Platform,
   Animated,
   Pressable,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Article, CATEGORIES } from '../types/Article';
 import { formatDistanceToNow } from 'date-fns';
@@ -182,9 +182,10 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
       <View style={styles.imageContainer}>
         {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
           <Image 
-            source={{ uri: article.imageUrl }} 
+            source={article.imageUrl}
             style={styles.image}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="disk"
             onError={() => setImageError(true)}
           />
         ) : null}
@@ -240,7 +241,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('🤯'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
             >
-              <Text style={styles.fabEmoji}>🤯</Text>
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤯</Text></View>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab2Style]}>
@@ -248,7 +249,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('😂'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
             >
-              <Text style={styles.fabEmoji}>😂</Text>
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>😂</Text></View>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab3Style]}>
@@ -256,7 +257,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('🤮'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
             >
-              <Text style={styles.fabEmoji}>🤮</Text>
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤮</Text></View>
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab4Style]}>
@@ -427,11 +428,15 @@ const styles = StyleSheet.create({
   fabOptionActive: {
     backgroundColor: '#FF6B6B',
   },
+  fabEmojiWrap: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   fabEmoji: {
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 22,
     textAlign: 'center',
-    textAlignVertical: 'center',
     includeFontPadding: false,
   },
 });

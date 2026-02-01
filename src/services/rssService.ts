@@ -10,6 +10,12 @@ const RSS_FEEDS: { url: string; category: Category; source: string; alwaysOdd?: 
   { url: 'https://www.ladbible.com/feeds/weird', category: 'viral', source: 'LADbible', alwaysOdd: true },
   { url: 'https://www.odditycentral.com/feed', category: 'viral', source: 'Oddity Central', alwaysOdd: true },
   { url: 'https://www.atlasobscura.com/feeds/latest', category: 'world', source: 'Atlas Obscura', alwaysOdd: true },
+  { url: 'https://feeds.skynews.com/feeds/rss/strange.xml', category: 'viral', source: 'Sky News', alwaysOdd: true },
+  { url: 'https://www.independent.co.uk/news/weird-news/rss', category: 'viral', source: 'Independent', alwaysOdd: true },
+  { url: 'https://feeds.feedburner.com/ndtvnews-offbeat', category: 'viral', source: 'NDTV', alwaysOdd: true },
+  
+  // === SCIENCE (strange/offbeat) ===
+  { url: 'https://www.sciencedaily.com/rss/strange_offbeat.xml', category: 'tech', source: 'ScienceDaily', alwaysOdd: true },
   
   // === TECH (quirky takes) ===
   { url: 'https://www.theregister.com/offbeat/headlines.atom', category: 'tech', source: 'The Register', alwaysOdd: true },
@@ -66,7 +72,7 @@ async function fetchRSS(feedUrl: string): Promise<RSSItem[]> {
           description: cleanText(description || ''),
           link: cleanLink(link),
           pubDate: pubDate || new Date(Date.now() - 86400000).toISOString(), // Default to 24h ago if no date
-          thumbnail,
+          thumbnail: thumbnail || undefined,
         });
       }
     }

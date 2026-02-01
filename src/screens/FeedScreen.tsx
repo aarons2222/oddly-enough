@@ -240,18 +240,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   const renderHeader = () => (
     <View style={[styles.header, { backgroundColor: theme.card }]}>
       <TouchableOpacity onPress={onBookmarksPress} style={styles.headerButton}>
-        <Ionicons name="bookmark" size={22} color={theme.text} />
+        <Ionicons name="bookmark" size={26} color={theme.text} />
       </TouchableOpacity>
       <TouchableOpacity onPress={handleRefresh} style={styles.logoContainer} activeOpacity={0.7}>
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => setShowSettings(true)} style={styles.headerButton}>
-        <Ionicons 
-          name="settings-outline" 
-          size={22} 
-          color={theme.text} 
-        />
+        <Ionicons name="settings-outline" size={26} color={theme.text} />
       </TouchableOpacity>
     </View>
   );
