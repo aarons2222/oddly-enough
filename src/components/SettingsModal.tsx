@@ -53,7 +53,7 @@ export function SettingsModal({ visible, onClose }: Props) {
   const theme = isDarkMode ? darkTheme : lightTheme;
   const insets = useSafeAreaInsets();
   
-  const slideAnim = useRef(new Animated.Value(height)).current;
+  const scaleAnim = useRef(new Animated.Value(0)).current;
   const bgOpacity = useRef(new Animated.Value(0)).current;
   const titleWobble = useRef(new Animated.Value(0)).current;
   const wobbleAnimation = useRef<Animated.CompositeAnimation | null>(null);
@@ -61,8 +61,8 @@ export function SettingsModal({ visible, onClose }: Props) {
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.spring(slideAnim, { toValue: 0, tension: 65, friction: 11, useNativeDriver: true }),
-        Animated.timing(bgOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(scaleAnim, { toValue: 1, tension: 80, friction: 10, useNativeDriver: true }),
+        Animated.timing(bgOpacity, { toValue: 1, duration: 200, useNativeDriver: true }),
       ]).start();
       
       // Title wobble - only start if not already running
@@ -76,7 +76,7 @@ export function SettingsModal({ visible, onClose }: Props) {
         wobbleAnimation.current.start();
       }
     } else {
-      slideAnim.setValue(height);
+      scaleAnim.setValue(0);
       bgOpacity.setValue(0);
       // Stop wobble when closing
       if (wobbleAnimation.current) {
@@ -88,8 +88,8 @@ export function SettingsModal({ visible, onClose }: Props) {
 
   const handleClose = () => {
     Animated.parallel([
-      Animated.timing(slideAnim, { toValue: height, duration: 250, useNativeDriver: true }),
-      Animated.timing(bgOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 0, duration: 200, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+      Animated.timing(bgOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
     ]).start(() => onClose());
   };
 
@@ -110,7 +110,12 @@ export function SettingsModal({ visible, onClose }: Props) {
             backgroundColor: isDarkMode ? '#0a0a0f' : '#f0f0ff',
             paddingTop: insets.top + 20,
             paddingBottom: insets.bottom + 20,
-            transform: [{ translateY: slideAnim }],
+            transform: [
+              { translateX: scaleAnim.interpolate({ inputRange: [0, 1], outputRange: [width / 2 - 20, 0] }) },
+              { translateY: scaleAnim.interpolate({ inputRange: [0, 1], outputRange: [-height / 2 + 30, 0] }) },
+              { scale: scaleAnim },
+            ],
+            opacity: scaleAnim,
           }
         ]}
       >
@@ -127,15 +132,16 @@ export function SettingsModal({ visible, onClose }: Props) {
 
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <View style={[styles.closeCircle, { backgroundColor: isDarkMode ? '#222' : '#ddd' }]}>
-              <Ionicons name="close" size={24} color={isDarkMode ? '#fff' : '#333'} />
-            </View>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
+            <Ionicons name="close" size={20} color="#fff" />
           </TouchableOpacity>
           
-          <Animated.Text style={[styles.title, { color: theme.text, transform: [{ rotate: titleRotate }] }]}>
-            ⚙️ Weird Settings
-          </Animated.Text>
+          <Animated.View style={[styles.logoContainer, { transform: [{ rotate: titleRotate }] }]}>
+            <Text style={[styles.logo, { color: theme.text }]}>Weird</Text>
+            <Text style={styles.logoAccent}>Settings</Text>
+          </Animated.View>
+          
+          <View style={styles.placeholder} />
         </View>
 
         {/* Settings Cards */}
@@ -228,26 +234,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 40,
   },
   closeButton: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    zIndex: 10,
-  },
-  closeCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 32,
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: 28,
     fontWeight: '800',
-    marginTop: 8,
+  },
+  logoAccent: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FF6B6B',
+    marginLeft: 4,
+  },
+  placeholder: {
+    width: 44,
   },
   cardsContainer: {
     gap: 16,

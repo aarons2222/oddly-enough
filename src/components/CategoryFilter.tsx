@@ -6,7 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   LayoutChangeEvent,
-  Modal,
+  Animated,
   Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,6 +34,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
   const scrollViewRef = useRef<ScrollView>(null);
   const chipPositions = useRef<{ [key: string]: { x: number; width: number } }>({});
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const morphAnim = useRef(new Animated.Value(0)).current;
 
   // Filter to only show categories that have articles
   const visibleCategories = availableCategories 
@@ -44,7 +45,6 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
   useEffect(() => {
     const pos = chipPositions.current[selected];
     if (pos && scrollViewRef.current) {
-      // Scroll to center the selected chip
       scrollViewRef.current.scrollTo({ 
         x: Math.max(0, pos.x - 100), 
         animated: true 
@@ -59,18 +59,123 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
 
   const currentSort = SORT_OPTIONS.find(s => s.id === sortBy) || SORT_OPTIONS[0];
 
+  const openMenu = () => {
+    setShowSortMenu(true);
+    Animated.spring(morphAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 80,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const closeMenu = () => {
+    Animated.spring(morphAnim, {
+      toValue: 0,
+      friction: 8,
+      tension: 80,
+      useNativeDriver: false,
+    }).start(() => {
+      setShowSortMenu(false);
+    });
+  };
+
+  const handleSelect = (option: SortOption) => {
+    onSortChange?.(option);
+    closeMenu();
+  };
+
+  // Animated styles for morphing
+  const morphWidth = morphAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [52, 180],
+  });
+
+  const morphHeight = morphAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [36, 130],
+  });
+
+  const morphBorderRadius = morphAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [20, 16],
+  });
+
+  const menuOpacity = morphAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, 0, 1],
+  });
+
+  const buttonOpacity = morphAnim.interpolate({
+    inputRange: [0, 0.3],
+    outputRange: [1, 0],
+  });
+
   return (
     <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
       <View style={styles.row}>
-        {/* Sort Button */}
-        <TouchableOpacity
-          style={[styles.sortButton, { backgroundColor: theme.categoryBg }]}
-          onPress={() => setShowSortMenu(true)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
-          <Ionicons name="chevron-down" size={14} color={theme.accent} style={{ marginLeft: 2 }} />
-        </TouchableOpacity>
+        {/* Sort Button / Morphing Menu */}
+        <View style={styles.sortWrapper}>
+          <Animated.View
+            style={[
+              styles.morphContainer,
+              {
+                backgroundColor: theme.categoryBg,
+                width: morphWidth,
+                height: morphHeight,
+                borderRadius: morphBorderRadius,
+              },
+            ]}
+          >
+            {/* Collapsed button content */}
+            <Animated.View style={[styles.buttonContent, { opacity: buttonOpacity }]}>
+              <TouchableOpacity
+                style={styles.sortButtonInner}
+                onPress={openMenu}
+                activeOpacity={0.7}
+              >
+                <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
+                <Ionicons name="chevron-down" size={14} color={theme.accent} style={{ marginLeft: 2 }} />
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* Expanded menu content */}
+            {showSortMenu && (
+              <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]}>
+                {SORT_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.sortOption,
+                      sortBy === option.id && { backgroundColor: theme.accent + '20' },
+                    ]}
+                    onPress={() => handleSelect(option.id)}
+                  >
+                    <Ionicons 
+                      name={option.icon as any} 
+                      size={18} 
+                      color={sortBy === option.id ? theme.accent : theme.textSecondary} 
+                    />
+                    <Text style={[
+                      styles.sortOptionText, 
+                      { color: sortBy === option.id ? theme.accent : theme.text }
+                    ]}>
+                      {option.label}
+                    </Text>
+                    {sortBy === option.id && (
+                      <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </Animated.View>
+            )}
+          </Animated.View>
+
+          {/* Backdrop to close menu */}
+          {showSortMenu && (
+            <Pressable style={styles.backdrop} onPress={closeMenu} />
+          )}
+        </View>
 
         {/* Category ScrollView */}
         <ScrollView 
@@ -109,48 +214,6 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
           })}
         </ScrollView>
       </View>
-
-      {/* Sort Menu Modal */}
-      <Modal
-        visible={showSortMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowSortMenu(false)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setShowSortMenu(false)}>
-          <View style={[styles.sortMenu, { backgroundColor: theme.card }]}>
-            <Text style={[styles.sortMenuTitle, { color: theme.text }]}>Sort by</Text>
-            {SORT_OPTIONS.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.sortOption,
-                  sortBy === option.id && { backgroundColor: theme.categoryBg },
-                ]}
-                onPress={() => {
-                  onSortChange?.(option.id);
-                  setShowSortMenu(false);
-                }}
-              >
-                <Ionicons 
-                  name={option.icon as any} 
-                  size={20} 
-                  color={sortBy === option.id ? theme.accent : theme.textSecondary} 
-                />
-                <Text style={[
-                  styles.sortOptionText, 
-                  { color: sortBy === option.id ? theme.accent : theme.text }
-                ]}>
-                  {option.label}
-                </Text>
-                {sortBy === option.id && (
-                  <Ionicons name="checkmark" size={20} color={theme.accent} style={{ marginLeft: 'auto' }} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
     </View>
   );
 }
@@ -159,19 +222,46 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
     borderBottomWidth: 1,
+    zIndex: 100,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
+  sortWrapper: {
     marginLeft: 16,
     marginRight: 8,
+    zIndex: 200,
+  },
+  morphContainer: {
+    overflow: 'hidden',
+  },
+  buttonContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sortButtonInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  menuContent: {
+    padding: 8,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: -100,
+    left: -100,
+    right: -500,
+    bottom: -1000,
+    zIndex: -1,
   },
   scrollView: {
     flex: 1,
@@ -202,37 +292,16 @@ const styles = StyleSheet.create({
   labelSelected: {
     color: '#fff',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sortMenu: {
-    width: 250,
-    borderRadius: 16,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  sortMenuTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
   sortOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   sortOptionText: {
-    fontSize: 16,
-    marginLeft: 12,
+    fontSize: 15,
+    marginLeft: 10,
+    fontWeight: '500',
   },
 });

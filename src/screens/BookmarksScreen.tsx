@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,11 +52,14 @@ export function BookmarksScreen({ onBack, onArticleSelect }: Props) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={theme.text} />
+      <View style={[styles.header, { backgroundColor: theme.card }]}>
+        <TouchableOpacity onPress={onBack} style={styles.closeButton} activeOpacity={0.8}>
+          <Ionicons name="close" size={20} color="#fff" />
         </TouchableOpacity>
-        <Text style={[styles.title, { color: theme.text }]}>Bookmarks</Text>
+        <View style={styles.logoContainer}>
+          <Text style={[styles.logo, { color: theme.text }]}>Saved</Text>
+          <Text style={styles.logoAccent}>Stories</Text>
+        </View>
         <View style={styles.placeholder} />
       </View>
 
@@ -81,15 +85,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
   },
-  backButton: {
-    padding: 8,
-    marginLeft: -8,
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...(Platform.OS === 'web' ? {
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+    } : {}),
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    fontSize: 28,
+    fontWeight: '800',
+  },
+  logoAccent: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FF6B6B',
+    marginLeft: 4,
   },
   placeholder: {
     width: 40,

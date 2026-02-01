@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FeedScreen } from './src/screens/FeedScreen';
@@ -11,7 +11,7 @@ import { Article } from './src/types/Article';
 
 type Screen = 'feed' | 'article' | 'bookmarks';
 
-const { height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 function AppContent() {
   const { isDarkMode } = useApp();
@@ -25,6 +25,7 @@ function AppContent() {
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const articleSlideAnim = useRef(new Animated.Value(height)).current;
+  const bookmarksScale = useRef(new Animated.Value(0)).current;
 
   const navigateToArticle = (article: Article) => {
     setSelectedArticle(article);
@@ -55,34 +56,27 @@ function AppContent() {
 
   const navigateToBookmarks = () => {
     setPreviousScreen('feed');
+    setCurrentScreen('bookmarks');
     
-    // Fade transition
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 150,
+    // Scale/morph from button position (top-left area)
+    bookmarksScale.setValue(0);
+    Animated.spring(bookmarksScale, {
+      toValue: 1,
+      tension: 80,
+      friction: 10,
       useNativeDriver: true,
-    }).start(() => {
-      setCurrentScreen('bookmarks');
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    });
+    }).start();
   };
 
   const navigateToFeed = () => {
-    Animated.timing(fadeAnim, {
+    // Scale down back to button
+    Animated.timing(bookmarksScale, {
       toValue: 0,
-      duration: 150,
+      duration: 200,
+      easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start(() => {
       setCurrentScreen('feed');
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
     });
   };
 
@@ -100,20 +94,36 @@ function AppContent() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} backgroundColor={theme.background} />
       
-      {/* Base layer - Feed or Bookmarks */}
-      <Animated.View style={[styles.screenContainer, { opacity: fadeAnim }]}>
-        {currentScreen === 'feed' || currentScreen === 'article' ? (
-          <FeedScreen 
-            onArticleSelect={navigateToArticle} 
-            onBookmarksPress={navigateToBookmarks}
-          />
-        ) : (
+      {/* Base layer - Feed */}
+      <View style={styles.screenContainer}>
+        <FeedScreen 
+          onArticleSelect={navigateToArticle} 
+          onBookmarksPress={navigateToBookmarks}
+        />
+      </View>
+      
+      {/* Bookmarks layer - morphs from button */}
+      {currentScreen === 'bookmarks' && (
+        <Animated.View 
+          style={[
+            styles.bookmarksContainer,
+            { 
+              backgroundColor: theme.background,
+              transform: [
+                { translateX: bookmarksScale.interpolate({ inputRange: [0, 1], outputRange: [-width / 2 + 40, 0] }) },
+                { translateY: bookmarksScale.interpolate({ inputRange: [0, 1], outputRange: [-height / 2 + 50, 0] }) },
+                { scale: bookmarksScale },
+              ],
+              opacity: bookmarksScale,
+            }
+          ]}
+        >
           <BookmarksScreen 
             onBack={navigateToFeed} 
             onArticleSelect={navigateToArticle}
           />
-        )}
-      </Animated.View>
+        </Animated.View>
+      )}
       
       {/* Article layer - slides up over feed */}
       {currentScreen === 'article' && selectedArticle && (
@@ -142,6 +152,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   articleContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  bookmarksContainer: {
     position: 'absolute',
     top: 0,
     left: 0,

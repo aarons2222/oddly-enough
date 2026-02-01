@@ -81,11 +81,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   // Sort articles based on current sort option
   const sortArticles = useCallback((articles: Article[], stats: Record<string, ArticleStats> = {}) => {
     return [...articles].sort((a, b) => {
-      // Group by category when showing all
-      if (category === 'all' && a.category !== b.category) {
-        return a.category.localeCompare(b.category);
-      }
-      
       switch (sortBy) {
         case 'trending': {
           const aStats = stats[a.id];
@@ -102,7 +97,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
           return b.publishedAt.getTime() - a.publishedAt.getTime();
       }
     });
-  }, [category, sortBy]);
+  }, [sortBy]);
 
   const loadArticles = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -132,10 +127,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       console.log('Got stats:', stats);
       setArticleStats(stats);
       
-      // Store raw articles for re-sorting, and sort for display
+      // Store raw articles - sorting will be handled by the useEffect
       setRawArticles(uniqueArticles);
-      const sortedArticles = sortArticles(uniqueArticles, stats);
-      setArticles(sortedArticles);
       
       // Preload ALL article content in background
       const urlsToPreload = uniqueArticles.map(a => a.url);
@@ -146,7 +139,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [category, sortArticles]);
+  }, [category]);
 
   useEffect(() => {
     loadArticles();
@@ -177,15 +170,13 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       freshArticles.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
       
-      // Fetch stats and sort
+      // Fetch stats
       const articleIds = uniqueArticles.map(a => a.id);
       const stats = await fetchStats(articleIds);
       setArticleStats(stats);
       
-      // Store raw articles for re-sorting
+      // Store raw articles - sorting handled by useEffect
       setRawArticles(uniqueArticles);
-      const sortedArticles = sortArticles(uniqueArticles, stats);
-      setArticles(sortedArticles);
       
       // Preload content
       const urlsToPreload = uniqueArticles.map(a => a.url);

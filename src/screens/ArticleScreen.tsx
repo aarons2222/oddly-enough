@@ -308,11 +308,10 @@ export function ArticleScreen({ article, onBack }: Props) {
       >
         <TouchableOpacity 
           onPress={onBack} 
-          style={styles.backButtonInner}
+          style={styles.closeButtonCircle}
           activeOpacity={0.8}
         >
-          <Ionicons name="arrow-back" size={20} color="#fff" />
-          <Text style={styles.backButtonText}>Back</Text>
+          <Ionicons name="close" size={20} color="#fff" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -329,10 +328,9 @@ export function ArticleScreen({ article, onBack }: Props) {
       >
         <TouchableOpacity 
           onPress={handleShare} 
-          style={styles.backButtonInner}
+          style={styles.closeButtonCircle}
           activeOpacity={0.8}
         >
-          <Text style={styles.backButtonText}>Share</Text>
           <Ionicons name="share-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </Animated.View>
@@ -547,6 +545,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 25,
     gap: 6,
+    ...(Platform.OS === 'web' ? {
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+    } : {}),
+  },
+  closeButtonCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
     ...(Platform.OS === 'web' ? {
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',

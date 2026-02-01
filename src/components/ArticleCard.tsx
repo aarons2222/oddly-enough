@@ -279,7 +279,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
                 rotate: fabAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] }) 
               }] 
             }}>
-              <Ionicons name="add" size={28} color="#fff" />
+              <Ionicons name="add" size={24} color="#fff" />
             </Animated.View>
           </TouchableOpacity>
         </View>
@@ -386,16 +386,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
-    width: 50,
-    height: 50,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
   },
   fabMain: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FF6B6B',
     alignItems: 'center',
     justifyContent: 'center',
