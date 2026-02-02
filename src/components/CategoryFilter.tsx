@@ -241,11 +241,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingLeft: 16,
+    position: 'relative',
+    zIndex: 100,
   },
   morphContainer: {
     marginRight: 8,
-    overflow: 'visible',
+    overflow: 'hidden',
     zIndex: 100,
+    position: 'relative',
   },
   buttonContent: {
     position: 'absolute',
@@ -263,6 +266,8 @@ const styles = StyleSheet.create({
   },
   menuContent: {
     padding: 6,
+    position: 'relative',
+    zIndex: 101,
   },
   menuTitle: {
     fontSize: 10,
