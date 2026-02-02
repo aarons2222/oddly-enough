@@ -67,36 +67,28 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
     }).start();
   };
 
-  // FAB button animations - horizontal row to the left
+  // FAB button animations - horizontal row to the left (no scale to avoid emoji rendering issues)
   const fab1Style = {
     transform: [
-      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }) },
-      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab2Style = {
     transform: [
-      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -95] }) },
-      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab3Style = {
     transform: [
-      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -140] }) },
-      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab4Style = {
     transform: [
-      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -185] }) },
-      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
