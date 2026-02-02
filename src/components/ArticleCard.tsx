@@ -227,43 +227,47 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         
         {/* FAB Container */}
         <View style={styles.fabContainer}>
-          {/* Expanded buttons */}
-          <Animated.View style={[styles.fabOption, fab1Style]}>
-            <TouchableOpacity 
-              onPress={() => { onReact?.('🤯'); toggleFab(); }} 
-              style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
-            >
-              <PlatformIcon name="reaction-mindblown" size={22} color="#000" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={[styles.fabOption, fab2Style]}>
-            <TouchableOpacity 
-              onPress={() => { onReact?.('😂'); toggleFab(); }} 
-              style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
-            >
-              <PlatformIcon name="reaction-laugh" size={22} color="#000" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={[styles.fabOption, fab3Style]}>
-            <TouchableOpacity 
-              onPress={() => { onReact?.('🤮'); toggleFab(); }} 
-              style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
-            >
-              <PlatformIcon name="reaction-vomit" size={22} color="#000" />
-            </TouchableOpacity>
-          </Animated.View>
-          <Animated.View style={[styles.fabOption, fab4Style]}>
-            <TouchableOpacity 
-              onPress={() => { onBookmark?.(); toggleFab(); }} 
-              style={styles.fabOptionButton}
-            >
-              <PlatformIcon 
-                name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
-                size={20} 
-                color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
-              />
-            </TouchableOpacity>
-          </Animated.View>
+          {/* Expanded buttons - no animation, just show/hide */}
+          {fabOpen && (
+            <>
+              <View style={[styles.fabOption, { transform: [{ translateX: -50 }] }]}>
+                <TouchableOpacity 
+                  onPress={() => { onReact?.('🤯'); toggleFab(); }} 
+                  style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
+                >
+                  <Text style={styles.fabReactionEmoji}>🤯</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.fabOption, { transform: [{ translateX: -95 }] }]}>
+                <TouchableOpacity 
+                  onPress={() => { onReact?.('😂'); toggleFab(); }} 
+                  style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
+                >
+                  <Text style={styles.fabReactionEmoji}>😂</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.fabOption, { transform: [{ translateX: -140 }] }]}>
+                <TouchableOpacity 
+                  onPress={() => { onReact?.('🤮'); toggleFab(); }} 
+                  style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
+                >
+                  <Text style={styles.fabReactionEmoji}>🤮</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.fabOption, { transform: [{ translateX: -185 }] }]}>
+                <TouchableOpacity 
+                  onPress={() => { onBookmark?.(); toggleFab(); }} 
+                  style={styles.fabOptionButton}
+                >
+                  <PlatformIcon 
+                    name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
+                    size={20} 
+                    color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
+                  />
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
           
           {/* Main FAB button */}
           <TouchableOpacity onPress={toggleFab} style={styles.fabMain}>
@@ -420,5 +424,9 @@ const styles = StyleSheet.create({
   },
   fabOptionActive: {
     backgroundColor: '#FF6B6B',
+  },
+  fabReactionEmoji: {
+    fontSize: 20,
+    textAlign: 'center',
   },
 });
