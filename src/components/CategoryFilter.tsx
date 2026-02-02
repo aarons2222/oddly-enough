@@ -151,8 +151,8 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
               onPress={openMenu}
               activeOpacity={0.7}
             >
-              <PlatformIcon name={currentSort.icon} size={16} color={theme.accent} />
-              <PlatformIcon name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
+              <PlatformIcon name={currentSort.icon} size={20} color={theme.accent} />
+              <PlatformIcon name="chevron-down" size={14} color={theme.accent} style={{ marginLeft: 2 }} />
             </TouchableOpacity>
           </Animated.View>
 
@@ -172,7 +172,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                 >
                   <PlatformIcon 
                     name={option.icon} 
-                    size={18} 
+                    size={22} 
                     color={sortBy === option.id ? theme.accent : theme.textSecondary} 
                   />
                   <Text style={[
@@ -182,7 +182,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                     {option.label}
                   </Text>
                   {sortBy === option.id && (
-                    <PlatformIcon name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                    <PlatformIcon name="checkmark" size={22} color={theme.accent} style={{ marginLeft: 'auto' }} />
                   )}
                 </TouchableOpacity>
               ))}
