@@ -419,6 +419,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4ECDC4',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'visible',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -435,8 +436,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fabEmoji: {
-    fontSize: 22,
+    fontSize: 20,
     textAlign: 'center',
+    lineHeight: 28,
     includeFontPadding: false,
   },
 });
