@@ -22,11 +22,11 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
   { id: 'oldest', label: 'Oldest', icon: 'hourglass-outline' },
 ];
 
-// Fixed dimensions
+// Dimensions
 const COLLAPSED_WIDTH = 52;
 const COLLAPSED_HEIGHT = 36;
-const EXPANDED_WIDTH = 160;
-const EXPANDED_HEIGHT = 140;
+const EXPANDED_WIDTH = 150;
+const EXPANDED_HEIGHT = 136;
 
 interface Props {
   selected: Category;
@@ -92,7 +92,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
     closeMenu();
   };
 
-  // Animated interpolations
+  // Animated interpolations - these affect the actual layout
   const animatedWidth = animValue.interpolate({
     inputRange: [0, 1],
     outputRange: [COLLAPSED_WIDTH, EXPANDED_WIDTH],
@@ -104,97 +104,93 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
   });
 
   const menuOpacity = animValue.interpolate({
-    inputRange: [0, 0.6, 1],
+    inputRange: [0, 0.5, 1],
     outputRange: [0, 0, 1],
   });
 
   const buttonOpacity = animValue.interpolate({
-    inputRange: [0, 0.4],
+    inputRange: [0, 0.3],
     outputRange: [1, 0],
+  });
+
+  const borderRadius = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [18, 12],
   });
 
   return (
     <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
+      {/* Backdrop when expanded */}
+      {isExpanded && (
+        <Pressable 
+          style={styles.backdrop} 
+          onPress={closeMenu}
+        />
+      )}
+      
       <View style={styles.row}>
-        {/* Sort Button / Morphing Menu */}
-        <View style={styles.sortWrapper}>
-          {/* Backdrop when expanded */}
-          {isExpanded && (
-            <Pressable 
-              style={styles.backdrop} 
-              onPress={closeMenu}
-            />
-          )}
-          
-          <Animated.View
-            style={[
-              styles.morphContainer,
-              {
-                backgroundColor: theme.card,
-                width: animatedWidth,
-                height: animatedHeight,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: theme.border,
-              },
-            ]}
+        {/* Morphing Sort Button/Menu - inline, pushes content */}
+        <Animated.View
+          style={[
+            styles.morphContainer,
+            {
+              backgroundColor: theme.categoryBg,
+              width: animatedWidth,
+              height: animatedHeight,
+              borderRadius: borderRadius,
+            },
+          ]}
+        >
+          {/* Collapsed button content */}
+          <Animated.View 
+            style={[styles.buttonContent, { opacity: buttonOpacity }]}
+            pointerEvents={isExpanded ? 'none' : 'auto'}
           >
-            {/* Collapsed button - always rendered */}
-            <Animated.View 
-              style={[
-                styles.buttonContent, 
-                { opacity: buttonOpacity }
-              ]}
-              pointerEvents={isExpanded ? 'none' : 'auto'}
+            <TouchableOpacity
+              style={styles.sortButtonInner}
+              onPress={openMenu}
+              activeOpacity={0.7}
             >
-              <TouchableOpacity
-                style={[styles.sortButtonInner, { backgroundColor: theme.categoryBg }]}
-                onPress={openMenu}
-                activeOpacity={0.7}
-              >
-                <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
-                <Ionicons name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
-              </TouchableOpacity>
-            </Animated.View>
-
-            {/* Expanded menu */}
-            {isExpanded && (
-              <Animated.View 
-                style={[styles.menuContent, { opacity: menuOpacity }]}
-              >
-                <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
-                {SORT_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={[
-                      styles.sortOption,
-                      sortBy === option.id && { backgroundColor: theme.accent + '15' },
-                    ]}
-                    onPress={() => handleSelect(option.id)}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons 
-                      name={option.icon as any} 
-                      size={18} 
-                      color={sortBy === option.id ? theme.accent : theme.textSecondary} 
-                    />
-                    <Text style={[
-                      styles.sortOptionText, 
-                      { color: sortBy === option.id ? theme.accent : theme.text }
-                    ]}>
-                      {option.label}
-                    </Text>
-                    {sortBy === option.id && (
-                      <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </Animated.View>
-            )}
+              <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
+              <Ionicons name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
+            </TouchableOpacity>
           </Animated.View>
-        </View>
 
-        {/* Category ScrollView */}
+          {/* Expanded menu content */}
+          {isExpanded && (
+            <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]}>
+              <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
+              {SORT_OPTIONS.map((option) => (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.sortOption,
+                    sortBy === option.id && { backgroundColor: theme.accent + '15' },
+                  ]}
+                  onPress={() => handleSelect(option.id)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons 
+                    name={option.icon as any} 
+                    size={18} 
+                    color={sortBy === option.id ? theme.accent : theme.textSecondary} 
+                  />
+                  <Text style={[
+                    styles.sortOptionText, 
+                    { color: sortBy === option.id ? theme.accent : theme.text }
+                  ]}>
+                    {option.label}
+                  </Text>
+                  {sortBy === option.id && (
+                    <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </Animated.View>
+          )}
+        </Animated.View>
+
+        {/* Category ScrollView - will be pushed by the expanding menu */}
         <ScrollView 
           ref={scrollViewRef}
           horizontal 
@@ -243,25 +239,12 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sortWrapper: {
-    marginLeft: 16,
-    marginRight: 8,
-    zIndex: 200,
-    width: COLLAPSED_WIDTH,
-    height: COLLAPSED_HEIGHT,
+    alignItems: 'flex-start',
+    paddingLeft: 16,
   },
   morphContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
+    marginRight: 8,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   buttonContent: {
     position: 'absolute',
@@ -276,36 +259,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: COLLAPSED_WIDTH - 4,
-    height: COLLAPSED_HEIGHT - 4,
-    borderRadius: 14,
   },
   menuContent: {
-    padding: 8,
-    paddingTop: 4,
+    padding: 6,
   },
   menuTitle: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingTop: 4,
+    paddingBottom: 6,
   },
   backdrop: {
     position: 'absolute',
-    top: -100,
-    left: -100,
-    width: Dimensions.get('window').width + 200,
-    height: Dimensions.get('window').height + 200,
-    zIndex: -1,
+    top: -50,
+    left: 0,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    zIndex: 50,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingRight: 16,
-    gap: 8,
+    alignItems: 'center',
+    minHeight: COLLAPSED_HEIGHT,
   },
   chip: {
     flexDirection: 'row',
@@ -327,11 +308,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 9,
     borderRadius: 8,
   },
   sortOptionText: {
-    fontSize: 15,
+    fontSize: 14,
     marginLeft: 10,
     fontWeight: '500',
   },
