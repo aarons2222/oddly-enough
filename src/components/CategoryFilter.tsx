@@ -244,7 +244,8 @@ const styles = StyleSheet.create({
   },
   morphContainer: {
     marginRight: 8,
-    overflow: 'hidden',
+    overflow: 'visible',
+    zIndex: 100,
   },
   buttonContent: {
     position: 'absolute',
