@@ -233,7 +233,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('🤯'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
             >
-              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤯</Text></View>
+              <PlatformIcon name="reaction-mindblown" size={22} color="#000" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab2Style]}>
@@ -241,7 +241,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('😂'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
             >
-              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>😂</Text></View>
+              <PlatformIcon name="reaction-laugh" size={22} color="#000" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab3Style]}>
@@ -249,7 +249,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onReact?.('🤮'); toggleFab(); }} 
               style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
             >
-              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤮</Text></View>
+              <PlatformIcon name="reaction-vomit" size={22} color="#000" />
             </TouchableOpacity>
           </Animated.View>
           <Animated.View style={[styles.fabOption, fab4Style]}>
@@ -420,18 +420,5 @@ const styles = StyleSheet.create({
   },
   fabOptionActive: {
     backgroundColor: '#FF6B6B',
-  },
-  fabEmojiWrap: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  fabEmoji: {
-    fontSize: 18,
-    textAlign: 'center',
-    lineHeight: 40,
-    color: '#000',
   },
 });
