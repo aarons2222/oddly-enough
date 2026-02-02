@@ -228,39 +228,39 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         {/* FAB Container */}
         <View style={styles.fabContainer}>
           {/* Expanded buttons */}
-          <Animated.View style={[styles.fabOption, fab1Style]}>
+          <Animated.View style={[styles.fabOption, fab1Style]} pointerEvents={fabOpen ? 'auto' : 'none'}>
             <TouchableOpacity 
-              onPress={() => { onReact?.('🤯'); toggleFab(); }} 
+              onPress={() => { if (fabOpen) { onReact?.('🤯'); toggleFab(); } }} 
               style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
             >
               <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤯</Text></View>
             </TouchableOpacity>
           </Animated.View>
-          <Animated.View style={[styles.fabOption, fab2Style]}>
+          <Animated.View style={[styles.fabOption, fab2Style]} pointerEvents={fabOpen ? 'auto' : 'none'}>
             <TouchableOpacity 
-              onPress={() => { onReact?.('😂'); toggleFab(); }} 
+              onPress={() => { if (fabOpen) { onReact?.('😂'); toggleFab(); } }} 
               style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
             >
               <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>😂</Text></View>
             </TouchableOpacity>
           </Animated.View>
-          <Animated.View style={[styles.fabOption, fab3Style]}>
+          <Animated.View style={[styles.fabOption, fab3Style]} pointerEvents={fabOpen ? 'auto' : 'none'}>
             <TouchableOpacity 
-              onPress={() => { onReact?.('🤮'); toggleFab(); }} 
+              onPress={() => { if (fabOpen) { onReact?.('🤮'); toggleFab(); } }} 
               style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
             >
               <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤮</Text></View>
             </TouchableOpacity>
           </Animated.View>
-          <Animated.View style={[styles.fabOption, fab4Style]}>
+          <Animated.View style={[styles.fabOption, fab4Style]} pointerEvents={fabOpen ? 'auto' : 'none'}>
             <TouchableOpacity 
-              onPress={() => { onBookmark?.(); toggleFab(); }} 
-              style={styles.fabOptionButton}
+              onPress={() => { if (fabOpen) { onBookmark?.(); toggleFab(); } }} 
+              style={[styles.fabOptionButton, article.isBookmarked && styles.fabOptionActive]}
             >
               <PlatformIcon 
                 name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
                 size={20} 
-                color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
+                color="#fff"
               />
             </TouchableOpacity>
           </Animated.View>
