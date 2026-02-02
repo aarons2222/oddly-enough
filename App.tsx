@@ -24,7 +24,9 @@ function AppContent() {
   // Animation values
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const articleSlideAnim = useRef(new Animated.Value(height)).current;
+  const articleScale = useRef(new Animated.Value(0.85)).current;
+  const articleOpacity = useRef(new Animated.Value(0)).current;
+  const articleSlide = useRef(new Animated.Value(50)).current;
   const bookmarksScale = useRef(new Animated.Value(0)).current;
 
   const navigateToArticle = (article: Article) => {
@@ -32,23 +34,51 @@ function AppContent() {
     setPreviousScreen(currentScreen);
     setCurrentScreen('article');
     
-    // Slide up animation
-    articleSlideAnim.setValue(height);
-    Animated.spring(articleSlideAnim, {
-      toValue: 0,
-      tension: 65,
-      friction: 11,
-      useNativeDriver: true,
-    }).start();
+    // Hero animation - scale up + slide up + fade in
+    articleScale.setValue(0.9);
+    articleOpacity.setValue(0);
+    articleSlide.setValue(60);
+    
+    Animated.parallel([
+      Animated.spring(articleScale, {
+        toValue: 1,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(articleOpacity, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.spring(articleSlide, {
+        toValue: 0,
+        tension: 50,
+        friction: 10,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   const navigateBack = () => {
-    // Slide down animation
-    Animated.timing(articleSlideAnim, {
-      toValue: height,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => {
+    // Hero close - scale down + slide down + fade out
+    Animated.parallel([
+      Animated.timing(articleScale, {
+        toValue: 0.9,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(articleOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(articleSlide, {
+        toValue: 60,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
       setCurrentScreen(previousScreen);
       setSelectedArticle(null);
     });
@@ -125,14 +155,18 @@ function AppContent() {
         </Animated.View>
       )}
       
-      {/* Article layer - slides up over feed */}
+      {/* Article layer - hero animation */}
       {currentScreen === 'article' && selectedArticle && (
         <Animated.View 
           style={[
             styles.articleContainer,
             { 
               backgroundColor: 'transparent',
-              transform: [{ translateY: articleSlideAnim }] 
+              opacity: articleOpacity,
+              transform: [
+                { scale: articleScale },
+                { translateY: articleSlide },
+              ],
             }
           ]}
         >

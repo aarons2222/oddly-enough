@@ -3,7 +3,7 @@ import { Article } from '../types/Article';
 
 const CACHE_KEY = 'oddly_articles_cache';
 const CACHE_TIMESTAMP_KEY = 'oddly_cache_timestamp';
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
 export interface CachedData {
   articles: Article[];

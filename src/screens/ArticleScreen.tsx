@@ -290,6 +290,8 @@ export function ArticleScreen({ article, onBack }: Props) {
         title={article.title}
         url={article.url}
         summary={article.summary}
+        imageUrl={article.imageUrl || undefined}
+        source={article.source}
       />
       
       {/* Screen Bugs */}

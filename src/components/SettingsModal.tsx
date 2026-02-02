@@ -211,6 +211,7 @@ export function SettingsModal({ visible, onClose }: Props) {
               ios_backgroundColor="#ccc"
             />
           </View>
+
         </View>
 
         {/* Footer */}

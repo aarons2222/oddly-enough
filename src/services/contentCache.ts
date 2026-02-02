@@ -56,6 +56,28 @@ export async function setCachedContent(articleUrl: string, content: string): Pro
   }
 }
 
+// Clear all cached content
+export async function clearContentCache(): Promise<number> {
+  let cleared = 0;
+  try {
+    const allKeys = await AsyncStorage.getAllKeys();
+    const contentKeys = allKeys.filter(key => key.startsWith(CONTENT_CACHE_PREFIX));
+    
+    if (contentKeys.length > 0) {
+      await AsyncStorage.multiRemove(contentKeys);
+      cleared = contentKeys.length;
+    }
+    
+    // Also clear memory cache
+    memoryContentCache.clear();
+    
+    console.log(`Cleared ${cleared} cached articles`);
+  } catch (error) {
+    console.error('Error clearing content cache:', error);
+  }
+  return cleared;
+}
+
 // Preload content for multiple articles
 export async function preloadArticleContent(
   articleUrls: string[],
