@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from '../components/PlatformIcon';
 import { Article } from '../types/Article';
 import { ArticleCard } from '../components/ArticleCard';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
@@ -54,7 +54,7 @@ export function BookmarksScreen({ onBack, onArticleSelect }: Props) {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.card }]}>
         <TouchableOpacity onPress={onBack} style={styles.closeButton} activeOpacity={0.8}>
-          <Ionicons name="close" size={20} color="#fff" />
+          <PlatformIcon name="close" size={20} color="#fff" />
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Text style={[styles.logo, { color: theme.text }]}>Saved</Text>

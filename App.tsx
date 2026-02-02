@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 import { FeedScreen } from './src/screens/FeedScreen';
 import { ArticleScreen } from './src/screens/ArticleScreen';
 import { BookmarksScreen } from './src/screens/BookmarksScreen';
@@ -12,8 +13,10 @@ import { WeirdSplash } from './src/components/WeirdSplash';
 import { AppProvider, useApp, lightTheme, darkTheme } from './src/context/AppContext';
 import { Article } from './src/types/Article';
 
-// Keep splash screen visible while loading fonts
-SplashScreen.preventAutoHideAsync();
+// Keep splash screen visible while loading fonts (only on native)
+if (Platform.OS !== 'web') {
+  SplashScreen.preventAutoHideAsync();
+}
 
 type Screen = 'feed' | 'article' | 'bookmarks';
 
@@ -213,12 +216,13 @@ export default function App() {
   });
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && Platform.OS !== 'web') {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
+  // On web, don't wait for fonts (they load async via CSS)
+  if (!fontsLoaded && Platform.OS !== 'web') {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }]}>
         <ActivityIndicator size="large" color="#5BC0BE" />

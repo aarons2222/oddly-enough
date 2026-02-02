@@ -11,7 +11,7 @@ import {
   Dimensions,
   Linking,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from './PlatformIcon';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -141,7 +141,7 @@ export function SettingsModal({ visible, onClose }: Props) {
           </Animated.View>
           
           <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
-            <Ionicons name="close" size={20} color="#fff" />
+            <PlatformIcon name="close" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -230,7 +230,7 @@ export function SettingsModal({ visible, onClose }: Props) {
                 Help us find more weird stories
               </Text>
             </View>
-            <Ionicons name="heart" size={24} color="#FF6B6B" />
+            <PlatformIcon name="heart" size={24} color="#FF6B6B" />
           </TouchableOpacity>
 
         </View>

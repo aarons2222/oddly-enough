@@ -10,7 +10,7 @@ import {
   Pressable,
   Dimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from './PlatformIcon';
 import { Category, CATEGORIES } from '../types/Article';
 import { Theme, lightTheme } from '../context/AppContext';
 
@@ -151,8 +151,8 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
               onPress={openMenu}
               activeOpacity={0.7}
             >
-              <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
-              <Ionicons name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
+              <PlatformIcon name={currentSort.icon} size={16} color={theme.accent} />
+              <PlatformIcon name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
             </TouchableOpacity>
           </Animated.View>
 
@@ -170,8 +170,8 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                   onPress={() => handleSelect(option.id)}
                   activeOpacity={0.7}
                 >
-                  <Ionicons 
-                    name={option.icon as any} 
+                  <PlatformIcon 
+                    name={option.icon} 
                     size={18} 
                     color={sortBy === option.id ? theme.accent : theme.textSecondary} 
                   />
@@ -182,7 +182,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                     {option.label}
                   </Text>
                   {sortBy === option.id && (
-                    <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                    <PlatformIcon name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
                   )}
                 </TouchableOpacity>
               ))}

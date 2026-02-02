@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from './PlatformIcon';
 import { Article, CATEGORIES } from '../types/Article';
 import { formatDistanceToNow } from 'date-fns';
 import { Theme, lightTheme } from '../context/AppContext';
@@ -265,7 +265,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
               onPress={() => { onBookmark?.(); toggleFab(); }} 
               style={styles.fabOptionButton}
             >
-              <Ionicons 
+              <PlatformIcon 
                 name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
                 size={20} 
                 color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
@@ -280,7 +280,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
                 rotate: fabAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] }) 
               }] 
             }}>
-              <Ionicons name="add" size={24} color="#fff" />
+              <PlatformIcon name="add" size={24} color="#fff" />
             </Animated.View>
           </TouchableOpacity>
         </View>

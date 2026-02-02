@@ -11,7 +11,7 @@ import {
   Share,
   Image,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from './PlatformIcon';
 import * as Clipboard from 'expo-clipboard';
 
 interface Props {
@@ -118,7 +118,7 @@ export function ShareSheet({ visible, onClose, title, url, summary, imageUrl, so
             </View>
             
             <TouchableOpacity style={styles.shareCardButton} onPress={handleShareCard}>
-              <Ionicons name="share-outline" size={20} color="#fff" />
+              <PlatformIcon name="share-outline" size={20} color="#fff" />
               <Text style={styles.shareCardButtonText}>Share This Card</Text>
             </TouchableOpacity>
             
@@ -154,7 +154,7 @@ export function ShareSheet({ visible, onClose, title, url, summary, imageUrl, so
                 activeOpacity={0.7}
               >
                 <View style={[styles.iconCircle, { backgroundColor: option.color + '20' }]}>
-                  <Ionicons name={option.icon as any} size={24} color={option.color} />
+                  <PlatformIcon name={option.icon} size={24} color={option.color} />
                 </View>
                 <Text style={styles.optionLabel}>{option.label}</Text>
               </TouchableOpacity>

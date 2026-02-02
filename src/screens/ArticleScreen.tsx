@@ -15,7 +15,7 @@ import {
   PanResponder,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { PlatformIcon } from '../components/PlatformIcon';
 import { Article, CATEGORIES } from '../types/Article';
 import { format } from 'date-fns';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
@@ -313,7 +313,7 @@ export function ArticleScreen({ article, onBack }: Props) {
           style={styles.closeButtonCircle}
           activeOpacity={0.8}
         >
-          <Ionicons name="close" size={20} color="#fff" />
+          <PlatformIcon name="close" size={20} color="#fff" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -333,7 +333,7 @@ export function ArticleScreen({ article, onBack }: Props) {
           style={styles.closeButtonCircle}
           activeOpacity={0.8}
         >
-          <Ionicons name="share-outline" size={20} color="#fff" />
+          <PlatformIcon name="share-outline" size={20} color="#fff" />
         </TouchableOpacity>
       </Animated.View>
 
@@ -462,7 +462,7 @@ export function ArticleScreen({ article, onBack }: Props) {
             <Text style={[styles.sourceLinkText, { color: theme.textSecondary }]}>
               Continue reading on <Text style={styles.sourceName}>{article.source}</Text>
             </Text>
-            <Ionicons name="arrow-forward" size={18} color={theme.textMuted} />
+            <PlatformIcon name="arrow-forward" size={18} color={theme.textMuted} />
           </TouchableOpacity>
 
           {/* Footer Spacing */}
