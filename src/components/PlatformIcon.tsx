@@ -2,75 +2,70 @@ import React from 'react';
 import { Platform, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Map Ionicon names to emojis for web
+// Map Ionicon names to simple flat symbols for web
 const ICON_TO_EMOJI: Record<string, string> = {
   // Navigation & Actions
   'arrow-back': '←',
   'arrow-forward': '→',
   'chevron-back': '‹',
-  'chevron-down': '▼',
+  'chevron-down': '▾',
   'chevron-forward': '›',
   'close': '✕',
-  'settings-outline': '⚙️',
-  'bookmark': '🔖',
-  'bookmark-outline': '📑',
-  'share-outline': '↗️',
-  'share-social-outline': '↗️',
-  'open-outline': '↗️',
+  'settings-outline': '⚙',
+  'bookmark': '★',
+  'bookmark-outline': '☆',
+  'share-outline': '↗',
+  'share-social-outline': '↗',
+  'open-outline': '↗',
   'checkmark': '✓',
   'add': '+',
   'add-outline': '+',
   'remove': '−',
-  'heart': '❤️',
-  'heart-outline': '🤍',
+  'heart': '♥',
+  'heart-outline': '♡',
   
   // Sort & Filter
-  'time-outline': '🕐',
-  'time': '🕐',
-  'flame-outline': '🔥',
-  'flame': '🔥',
-  'hourglass-outline': '⏳',
-  'hourglass': '⏳',
-  'filter-outline': '⚡',
-  'funnel-outline': '⚡',
-  
-  // Reactions (fallback - most reactions use emojis directly)
-  'happy-outline': '😊',
-  'sad-outline': '😢',
-  'skull-outline': '💀',
+  'time-outline': '◷',
+  'time': '◷',
+  'flame-outline': '◆',
+  'flame': '◆',
+  'hourglass-outline': '◇',
+  'hourglass': '◇',
+  'filter-outline': '≡',
+  'funnel-outline': '≡',
   
   // Misc
-  'moon': '🌙',
-  'moon-outline': '🌙',
-  'sunny': '☀️',
-  'sunny-outline': '☀️',
-  'bug': '🐛',
-  'bug-outline': '🐛',
+  'moon': '☾',
+  'moon-outline': '☾',
+  'sunny': '☀',
+  'sunny-outline': '☀',
+  'bug': '⚑',
+  'bug-outline': '⚑',
   'infinite-outline': '∞',
   'refresh': '↻',
   'refresh-outline': '↻',
-  'ellipsis-horizontal': '•••',
+  'ellipsis-horizontal': '···',
   'ellipsis-vertical': '⋮',
-  'search': '🔍',
-  'search-outline': '🔍',
-  'star': '⭐',
+  'search': '○',
+  'search-outline': '○',
+  'star': '★',
   'star-outline': '☆',
-  'trash-outline': '🗑️',
-  'copy-outline': '📋',
-  'link-outline': '🔗',
-  'globe-outline': '🌐',
-  'information-circle-outline': 'ℹ️',
-  'alert-circle-outline': '⚠️',
-  'warning-outline': '⚠️',
-  'chatbubble-outline': '💬',
-  'eye-outline': '👁️',
-  'eye-off-outline': '👁️‍🗨️',
+  'trash-outline': '▢',
+  'copy-outline': '⧉',
+  'link-outline': '⛓',
+  'globe-outline': '◎',
+  'information-circle-outline': 'ⓘ',
+  'alert-circle-outline': '⚠',
+  'warning-outline': '⚠',
+  'chatbubble-outline': '◫',
+  'eye-outline': '◉',
+  'eye-off-outline': '◎',
   
   // Share options
-  'image-outline': '🖼️',
+  'image-outline': '▣',
   'logo-twitter': '𝕏',
-  'logo-whatsapp': '💬',
-  'paper-plane': '✈️',
+  'logo-whatsapp': '◫',
+  'paper-plane': '➤',
 };
 
 interface Props {
@@ -86,25 +81,26 @@ export function PlatformIcon({ name, size = 24, color = '#000', style }: Props) 
     return <Ionicons name={name as any} size={size} color={color} style={style} />;
   }
   
-  // On web, use emoji fallback
-  const emoji = ICON_TO_EMOJI[name] || '•';
-  const fontSize = size * 0.85; // Emojis render slightly larger
+  // On web, use simple symbol fallback
+  const symbol = ICON_TO_EMOJI[name] || '•';
+  const fontSize = size * 0.9;
   
   return (
     <Text 
       style={[
-        styles.emoji, 
+        styles.symbol, 
         { fontSize, color, lineHeight: size },
         style
       ]}
     >
-      {emoji}
+      {symbol}
     </Text>
   );
 }
 
 const styles = StyleSheet.create({
-  emoji: {
+  symbol: {
     textAlign: 'center',
+    fontWeight: '400',
   },
 });
