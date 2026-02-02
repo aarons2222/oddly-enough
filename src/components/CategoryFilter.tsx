@@ -6,8 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   LayoutChangeEvent,
-  Modal,
+  Animated,
   Pressable,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Category, CATEGORIES } from '../types/Article';
@@ -21,6 +22,12 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
   { id: 'oldest', label: 'Oldest', icon: 'hourglass-outline' },
 ];
 
+// Fixed dimensions
+const COLLAPSED_WIDTH = 52;
+const COLLAPSED_HEIGHT = 36;
+const EXPANDED_WIDTH = 160;
+const EXPANDED_HEIGHT = 140;
+
 interface Props {
   selected: Category;
   onSelect: (category: Category) => void;
@@ -33,7 +40,8 @@ interface Props {
 export function CategoryFilter({ selected, onSelect, theme = lightTheme, availableCategories, sortBy = 'newest', onSortChange }: Props) {
   const scrollViewRef = useRef<ScrollView>(null);
   const chipPositions = useRef<{ [key: string]: { x: number; width: number } }>({});
-  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const animValue = useRef(new Animated.Value(0)).current;
 
   // Filter to only show categories that have articles
   const visibleCategories = availableCategories 
@@ -58,23 +66,133 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
 
   const currentSort = SORT_OPTIONS.find(s => s.id === sortBy) || SORT_OPTIONS[0];
 
+  const openMenu = () => {
+    setIsExpanded(true);
+    Animated.spring(animValue, {
+      toValue: 1,
+      friction: 10,
+      tension: 100,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const closeMenu = () => {
+    Animated.spring(animValue, {
+      toValue: 0,
+      friction: 10,
+      tension: 100,
+      useNativeDriver: false,
+    }).start(() => {
+      setIsExpanded(false);
+    });
+  };
+
   const handleSelect = (option: SortOption) => {
     onSortChange?.(option);
-    setShowSortMenu(false);
+    closeMenu();
   };
+
+  // Animated interpolations
+  const animatedWidth = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [COLLAPSED_WIDTH, EXPANDED_WIDTH],
+  });
+
+  const animatedHeight = animValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [COLLAPSED_HEIGHT, EXPANDED_HEIGHT],
+  });
+
+  const menuOpacity = animValue.interpolate({
+    inputRange: [0, 0.6, 1],
+    outputRange: [0, 0, 1],
+  });
+
+  const buttonOpacity = animValue.interpolate({
+    inputRange: [0, 0.4],
+    outputRange: [1, 0],
+  });
 
   return (
     <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
       <View style={styles.row}>
-        {/* Sort Button */}
-        <TouchableOpacity
-          style={[styles.sortButton, { backgroundColor: theme.categoryBg }]}
-          onPress={() => setShowSortMenu(true)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
-          <Ionicons name="chevron-down" size={14} color={theme.accent} style={{ marginLeft: 2 }} />
-        </TouchableOpacity>
+        {/* Sort Button / Morphing Menu */}
+        <View style={styles.sortWrapper}>
+          {/* Backdrop when expanded */}
+          {isExpanded && (
+            <Pressable 
+              style={styles.backdrop} 
+              onPress={closeMenu}
+            />
+          )}
+          
+          <Animated.View
+            style={[
+              styles.morphContainer,
+              {
+                backgroundColor: theme.card,
+                width: animatedWidth,
+                height: animatedHeight,
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            {/* Collapsed button - always rendered */}
+            <Animated.View 
+              style={[
+                styles.buttonContent, 
+                { opacity: buttonOpacity }
+              ]}
+              pointerEvents={isExpanded ? 'none' : 'auto'}
+            >
+              <TouchableOpacity
+                style={[styles.sortButtonInner, { backgroundColor: theme.categoryBg }]}
+                onPress={openMenu}
+                activeOpacity={0.7}
+              >
+                <Ionicons name={currentSort.icon as any} size={16} color={theme.accent} />
+                <Ionicons name="chevron-down" size={12} color={theme.accent} style={{ marginLeft: 2 }} />
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* Expanded menu */}
+            {isExpanded && (
+              <Animated.View 
+                style={[styles.menuContent, { opacity: menuOpacity }]}
+              >
+                <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
+                {SORT_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.sortOption,
+                      sortBy === option.id && { backgroundColor: theme.accent + '15' },
+                    ]}
+                    onPress={() => handleSelect(option.id)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons 
+                      name={option.icon as any} 
+                      size={18} 
+                      color={sortBy === option.id ? theme.accent : theme.textSecondary} 
+                    />
+                    <Text style={[
+                      styles.sortOptionText, 
+                      { color: sortBy === option.id ? theme.accent : theme.text }
+                    ]}>
+                      {option.label}
+                    </Text>
+                    {sortBy === option.id && (
+                      <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </Animated.View>
+            )}
+          </Animated.View>
+        </View>
 
         {/* Category ScrollView */}
         <ScrollView 
@@ -113,45 +231,6 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
           })}
         </ScrollView>
       </View>
-
-      {/* Sort Menu Modal */}
-      <Modal
-        visible={showSortMenu}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowSortMenu(false)}
-      >
-        <Pressable style={styles.modalBackdrop} onPress={() => setShowSortMenu(false)}>
-          <View style={[styles.menuContainer, { backgroundColor: theme.card }]}>
-            <Text style={[styles.menuTitle, { color: theme.text }]}>Sort by</Text>
-            {SORT_OPTIONS.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.sortOption,
-                  sortBy === option.id && { backgroundColor: theme.accent + '20' },
-                ]}
-                onPress={() => handleSelect(option.id)}
-              >
-                <Ionicons 
-                  name={option.icon as any} 
-                  size={20} 
-                  color={sortBy === option.id ? theme.accent : theme.textSecondary} 
-                />
-                <Text style={[
-                  styles.sortOptionText, 
-                  { color: sortBy === option.id ? theme.accent : theme.text }
-                ]}>
-                  {option.label}
-                </Text>
-                {sortBy === option.id && (
-                  <Ionicons name="checkmark" size={20} color={theme.accent} style={{ marginLeft: 'auto' }} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
     </View>
   );
 }
@@ -160,20 +239,66 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
     borderBottomWidth: 1,
+    zIndex: 100,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  sortButton: {
+  sortWrapper: {
+    marginLeft: 16,
+    marginRight: 8,
+    zIndex: 200,
+    width: COLLAPSED_WIDTH,
+    height: COLLAPSED_HEIGHT,
+  },
+  morphContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: COLLAPSED_WIDTH,
+    height: COLLAPSED_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sortButtonInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 52,
-    height: 36,
-    borderRadius: 20,
-    marginLeft: 16,
-    marginRight: 8,
+    width: COLLAPSED_WIDTH - 4,
+    height: COLLAPSED_HEIGHT - 4,
+    borderRadius: 14,
+  },
+  menuContent: {
+    padding: 8,
+    paddingTop: 4,
+  },
+  menuTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: -100,
+    left: -100,
+    width: Dimensions.get('window').width + 200,
+    height: Dimensions.get('window').height + 200,
+    zIndex: -1,
   },
   scrollView: {
     flex: 1,
@@ -198,39 +323,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  menuContainer: {
-    width: 200,
-    borderRadius: 16,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  menuTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    opacity: 0.5,
-  },
   sortOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
   sortOptionText: {
-    fontSize: 16,
-    marginLeft: 12,
+    fontSize: 15,
+    marginLeft: 10,
     fontWeight: '500',
   },
 });
