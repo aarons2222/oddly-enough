@@ -9,6 +9,7 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
@@ -212,6 +213,26 @@ export function SettingsModal({ visible, onClose }: Props) {
             />
           </View>
 
+          {/* Feed the News Goblins Card */}
+          <TouchableOpacity 
+            style={[styles.card, styles.goblinCard, { backgroundColor: isDarkMode ? '#1a2a1a' : '#f0fff0', borderColor: '#4CAF50' }]}
+            onPress={() => Linking.openURL('https://buymeacoffee.com/oddlyenough')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.cardIcon}>
+              <Text style={styles.cardEmoji}>🧌</Text>
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                Feed the News Goblins
+              </Text>
+              <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                Help us find more weird stories
+              </Text>
+            </View>
+            <Ionicons name="heart" size={24} color="#FF6B6B" />
+          </TouchableOpacity>
+
         </View>
 
         {/* Footer */}
@@ -276,6 +297,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   chaosCard: {
+    borderWidth: 2,
+  },
+  goblinCard: {
     borderWidth: 2,
   },
   cardIcon: {
