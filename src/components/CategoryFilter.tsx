@@ -158,7 +158,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
 
           {/* Expanded menu content */}
           {isExpanded && (
-            <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]}>
+            <View style={styles.menuContent}>
               <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
               {SORT_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -186,7 +186,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                   )}
                 </TouchableOpacity>
               ))}
-            </Animated.View>
+            </View>
           )}
         </Animated.View>
 
