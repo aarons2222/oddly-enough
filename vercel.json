@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npx expo export --platform web && cp -r public/* dist/",
+  "outputDirectory": "dist",
+  "framework": null,
+  "installCommand": "npm install"
+}
