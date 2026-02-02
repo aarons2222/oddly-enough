@@ -77,14 +77,13 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
   };
 
   const closeMenu = () => {
+    setIsExpanded(false); // Hide content immediately
     Animated.spring(animValue, {
       toValue: 0,
       friction: 10,
       tension: 100,
       useNativeDriver: false,
-    }).start(() => {
-      setIsExpanded(false);
-    });
+    }).start();
   };
 
   const handleSelect = (option: SortOption) => {
