@@ -430,15 +430,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6B6B',
   },
   fabEmojiWrap: {
-    width: 28,
-    height: 28,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   fabEmoji: {
-    fontSize: 20,
+    fontSize: 18,
     textAlign: 'center',
-    lineHeight: 28,
-    includeFontPadding: false,
+    lineHeight: 40,
   },
 });
