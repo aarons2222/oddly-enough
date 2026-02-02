@@ -1,0 +1,6 @@
+# Oddly Enough - robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://oddly-enough.vercel.app/sitemap.xml
