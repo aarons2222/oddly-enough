@@ -139,41 +139,38 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Expanded menu content - always render when open, opacity handles visibility */}
-            <Animated.View 
-              style={[
-                styles.menuContent, 
-                { opacity: menuOpacity },
-                !showSortMenu && styles.menuHidden,
-              ]}
-              pointerEvents={showSortMenu ? 'auto' : 'none'}
-            >
-              {SORT_OPTIONS.map((option) => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={[
-                    styles.sortOption,
-                    sortBy === option.id && { backgroundColor: theme.accent + '20' },
-                  ]}
-                  onPress={() => handleSelect(option.id)}
-                >
-                  <Ionicons 
-                    name={option.icon as any} 
-                    size={18} 
-                    color={sortBy === option.id ? theme.accent : theme.textSecondary} 
-                  />
-                  <Text style={[
-                    styles.sortOptionText, 
-                    { color: sortBy === option.id ? theme.accent : theme.text }
-                  ]}>
-                    {option.label}
-                  </Text>
-                  {sortBy === option.id && (
-                    <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </Animated.View>
+            {/* Expanded menu content - only render when menu is open */}
+            {showSortMenu && (
+              <Animated.View 
+                style={[styles.menuContent, { opacity: menuOpacity }]}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.id}
+                    style={[
+                      styles.sortOption,
+                      sortBy === option.id && { backgroundColor: theme.accent + '20' },
+                    ]}
+                    onPress={() => handleSelect(option.id)}
+                  >
+                    <Ionicons 
+                      name={option.icon as any} 
+                      size={18} 
+                      color={sortBy === option.id ? theme.accent : theme.textSecondary} 
+                    />
+                    <Text style={[
+                      styles.sortOptionText, 
+                      { color: sortBy === option.id ? theme.accent : theme.text }
+                    ]}>
+                      {option.label}
+                    </Text>
+                    {sortBy === option.id && (
+                      <Ionicons name="checkmark" size={18} color={theme.accent} style={{ marginLeft: 'auto' }} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </Animated.View>
+            )}
           </Animated.View>
 
           {/* Backdrop to close menu */}
@@ -259,10 +256,6 @@ const styles = StyleSheet.create({
   },
   menuContent: {
     padding: 8,
-  },
-  menuHidden: {
-    position: 'absolute',
-    opacity: 0,
   },
   backdrop: {
     position: 'absolute',
