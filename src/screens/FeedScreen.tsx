@@ -252,14 +252,28 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     </View>
   );
 
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyEmoji}>🔍</Text>
-      <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-        No stories in this category yet
-      </Text>
-    </View>
-  );
+  // Only show empty state if we've finished loading and truly have no articles
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  
+  useEffect(() => {
+    if (!loading && !hasLoadedOnce) {
+      setHasLoadedOnce(true);
+    }
+  }, [loading, hasLoadedOnce]);
+
+  const renderEmpty = () => {
+    // Don't show empty state until we've completed at least one load
+    if (!hasLoadedOnce) return null;
+    
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyEmoji}>🔍</Text>
+        <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+          No stories in this category yet
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
