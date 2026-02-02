@@ -26,7 +26,7 @@ const SORT_OPTIONS: { id: SortOption; label: string; icon: string }[] = [
 const COLLAPSED_WIDTH = 52;
 const COLLAPSED_HEIGHT = 36;
 const EXPANDED_WIDTH = 150;
-const EXPANDED_HEIGHT = 136;
+const EXPANDED_HEIGHT = 150;
 
 interface Props {
   selected: Category;
