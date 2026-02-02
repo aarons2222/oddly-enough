@@ -120,16 +120,7 @@ export function SettingsModal({ visible, onClose }: Props) {
           }
         ]}
       >
-        {/* Floating decorations */}
-        {emojis.map((emoji, i) => (
-          <FloatingEmoji 
-            key={i} 
-            emoji={emoji} 
-            delay={i * 200} 
-            x={20 + (i % 4) * (width - 80) / 3} 
-            y={100 + Math.floor(i / 4) * 300 + (i % 3) * 50}
-          />
-        ))}
+        {/* Floating decorations removed for cleaner look */}
 
         {/* Header */}
         <View style={styles.header}>
