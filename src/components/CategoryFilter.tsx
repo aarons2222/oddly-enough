@@ -158,17 +158,16 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
 
           {/* Expanded menu content */}
           {isExpanded && (
-            <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]}>
+            <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]} pointerEvents="auto">
               <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
               {SORT_OPTIONS.map((option) => (
-                <TouchableOpacity
+                <Pressable
                   key={option.id}
                   style={[
                     styles.sortOption,
                     sortBy === option.id && { backgroundColor: theme.accent + '15' },
                   ]}
                   onPress={() => handleSelect(option.id)}
-                  activeOpacity={0.7}
                 >
                   <PlatformIcon 
                     name={option.icon} 
@@ -184,7 +183,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                   {sortBy === option.id && (
                     <PlatformIcon name="checkmark" size={22} color={theme.accent} style={{ marginLeft: 'auto' }} />
                   )}
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </Animated.View>
           )}
