@@ -158,7 +158,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
 
           {/* Expanded menu content */}
           {isExpanded && (
-            <Animated.View style={[styles.menuContent, { opacity: menuOpacity }]} pointerEvents="auto">
+            <View style={styles.menuContent}>
               <Text style={[styles.menuTitle, { color: theme.textSecondary }]}>Sort by</Text>
               {SORT_OPTIONS.map((option) => (
                 <Pressable
@@ -167,7 +167,10 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                     styles.sortOption,
                     sortBy === option.id && { backgroundColor: theme.accent + '15' },
                   ]}
-                  onPress={() => handleSelect(option.id)}
+                  onPress={() => {
+                    console.log('Sort option pressed:', option.id);
+                    handleSelect(option.id);
+                  }}
                 >
                   <PlatformIcon 
                     name={option.icon} 
@@ -185,7 +188,7 @@ export function CategoryFilter({ selected, onSelect, theme = lightTheme, availab
                   )}
                 </Pressable>
               ))}
-            </Animated.View>
+            </View>
           )}
         </Animated.View>
 
