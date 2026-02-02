@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 const ICON_TO_EMOJI: Record<string, string> = {
   // Navigation & Actions
   'arrow-back': '←',
+  'arrow-forward': '→',
   'chevron-back': '‹',
   'chevron-down': '▼',
   'chevron-forward': '›',
@@ -64,6 +65,15 @@ const ICON_TO_EMOJI: Record<string, string> = {
   'chatbubble-outline': '💬',
   'eye-outline': '👁️',
   'eye-off-outline': '👁️‍🗨️',
+  
+  // Share options
+  'image-outline': '🖼️',
+  'logo-twitter': '𝕏',
+  'logo-whatsapp': '💬',
+  'paper-plane': '✈️',
+  'paper-plane-outline': '✈️',
+  'send': '➤',
+  'send-outline': '➤',
 };
 
 interface Props {
