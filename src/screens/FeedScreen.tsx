@@ -100,7 +100,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   }, [sortBy]);
 
   const loadArticles = useCallback(async (showLoader = true) => {
-    if (showLoader) setLoading(true);
+    // Only show loader if we don't have any articles yet
+    if (showLoader && articles.length === 0) setLoading(true);
     try {
       // Always fetch all articles first to determine available categories
       const allData = await fetchArticles('all');
@@ -141,9 +142,37 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
     }
   }, [category]);
 
+  // Initial load - try cache first for instant display
   useEffect(() => {
-    loadArticles();
-  }, [loadArticles]);
+    const initLoad = async () => {
+      // Import getCachedArticles for direct cache check
+      const { getCachedArticles } = await import('../services/cacheService');
+      const cached = await getCachedArticles();
+      
+      if (cached && cached.length > 0) {
+        // Show cached immediately without loading state
+        const uniqueArticles = deduplicateArticles(cached);
+        setRawArticles(uniqueArticles);
+        setArticles(uniqueArticles);
+        setLoading(false);
+        
+        // Then refresh in background
+        loadArticles(false);
+      } else {
+        // No cache, show loader and fetch
+        loadArticles(true);
+      }
+    };
+    
+    initLoad();
+  }, []); // Only run once on mount
+  
+  // Re-run when category changes
+  useEffect(() => {
+    if (articles.length > 0) {
+      loadArticles(false);
+    }
+  }, [category]);
 
   // Re-sort when sort option changes (without refetching)
   const [rawArticles, setRawArticles] = useState<Article[]>([]);
