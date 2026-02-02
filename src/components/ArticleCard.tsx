@@ -70,25 +70,33 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
   // FAB button animations - horizontal row to the left
   const fab1Style = {
     transform: [
+      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -50] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab2Style = {
     transform: [
+      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -95] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab3Style = {
     transform: [
+      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -140] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
   const fab4Style = {
     transform: [
+      { scale: fabAnim },
       { translateX: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -185] }) },
+      { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0] }) },
     ],
     opacity: fabAnim,
   };
@@ -227,47 +235,43 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         
         {/* FAB Container */}
         <View style={styles.fabContainer}>
-          {/* Expanded buttons - no animation, just show/hide */}
-          {fabOpen && (
-            <>
-              <View style={[styles.fabOption, { transform: [{ translateX: -50 }] }]}>
-                <TouchableOpacity 
-                  onPress={() => { onReact?.('🤯'); toggleFab(); }} 
-                  style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
-                >
-                  <Text style={styles.fabReactionEmoji}>🤯</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[styles.fabOption, { transform: [{ translateX: -95 }] }]}>
-                <TouchableOpacity 
-                  onPress={() => { onReact?.('😂'); toggleFab(); }} 
-                  style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
-                >
-                  <Text style={styles.fabReactionEmoji}>😂</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[styles.fabOption, { transform: [{ translateX: -140 }] }]}>
-                <TouchableOpacity 
-                  onPress={() => { onReact?.('🤮'); toggleFab(); }} 
-                  style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
-                >
-                  <Text style={styles.fabReactionEmoji}>🤮</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={[styles.fabOption, { transform: [{ translateX: -185 }] }]}>
-                <TouchableOpacity 
-                  onPress={() => { onBookmark?.(); toggleFab(); }} 
-                  style={styles.fabOptionButton}
-                >
-                  <PlatformIcon 
-                    name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
-                    size={20} 
-                    color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
-                  />
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
+          {/* Expanded buttons */}
+          <Animated.View style={[styles.fabOption, fab1Style]}>
+            <TouchableOpacity 
+              onPress={() => { onReact?.('🤯'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '🤯' && styles.fabOptionActive]}
+            >
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤯</Text></View>
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab2Style]}>
+            <TouchableOpacity 
+              onPress={() => { onReact?.('😂'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '😂' && styles.fabOptionActive]}
+            >
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>😂</Text></View>
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab3Style]}>
+            <TouchableOpacity 
+              onPress={() => { onReact?.('🤮'); toggleFab(); }} 
+              style={[styles.fabOptionButton, article.reaction === '🤮' && styles.fabOptionActive]}
+            >
+              <View style={styles.fabEmojiWrap}><Text style={styles.fabEmoji}>🤮</Text></View>
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View style={[styles.fabOption, fab4Style]}>
+            <TouchableOpacity 
+              onPress={() => { onBookmark?.(); toggleFab(); }} 
+              style={styles.fabOptionButton}
+            >
+              <PlatformIcon 
+                name={article.isBookmarked ? 'bookmark' : 'bookmark-outline'} 
+                size={20} 
+                color={article.isBookmarked ? '#FF6B6B' : '#fff'} 
+              />
+            </TouchableOpacity>
+          </Animated.View>
           
           {/* Main FAB button */}
           <TouchableOpacity onPress={toggleFab} style={styles.fabMain}>
@@ -415,7 +419,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#4ECDC4',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'visible',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -425,8 +428,15 @@ const styles = StyleSheet.create({
   fabOptionActive: {
     backgroundColor: '#FF6B6B',
   },
-  fabReactionEmoji: {
-    fontSize: 20,
+  fabEmojiWrap: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fabEmoji: {
+    fontSize: 22,
     textAlign: 'center',
+    includeFontPadding: false,
   },
 });

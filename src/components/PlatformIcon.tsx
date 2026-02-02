@@ -71,14 +71,6 @@ const ICON_TO_EMOJI: Record<string, string> = {
   'logo-twitter': '𝕏',
   'logo-whatsapp': '💬',
   'paper-plane': '✈️',
-  'paper-plane-outline': '✈️',
-  'send': '➤',
-  'send-outline': '➤',
-  
-  // Reactions
-  'reaction-mindblown': '🤯',
-  'reaction-laugh': '😂',
-  'reaction-vomit': '🤮',
 };
 
 interface Props {
