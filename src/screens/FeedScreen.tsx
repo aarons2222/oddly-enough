@@ -100,8 +100,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   }, [sortBy]);
 
   const loadArticles = useCallback(async (showLoader = true) => {
-    // Only show loader if we don't have any articles yet
-    if (showLoader && articles.length === 0) setLoading(true);
+    if (showLoader) setLoading(true);
     try {
       // Always fetch all articles first to determine available categories
       const allData = await fetchArticles('all');
