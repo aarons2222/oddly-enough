@@ -10,6 +10,7 @@ import {
   Easing,
   Dimensions,
   Linking,
+  Platform,
 } from 'react-native';
 import { PlatformIcon } from './PlatformIcon';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
@@ -223,6 +224,33 @@ export function SettingsModal({ visible, onClose }: Props) {
             </View>
             <PlatformIcon name="heart" size={24} color="#FF6B6B" />
           </TouchableOpacity>
+
+          {/* Leave a Review Card - iOS/Android only */}
+          {Platform.OS !== 'web' && (
+            <TouchableOpacity 
+              style={[styles.card, { backgroundColor: isDarkMode ? '#2a1a2a' : '#fff0f8', borderColor: '#FFD700' }]}
+              onPress={() => {
+                const storeUrl = Platform.OS === 'ios'
+                  ? 'https://apps.apple.com/app/id6741090498?action=write-review'
+                  : 'market://details?id=com.oddlyenough.app';
+                Linking.openURL(storeUrl);
+              }}
+              activeOpacity={0.8}
+            >
+              <View style={styles.cardIcon}>
+                <Text style={styles.cardEmoji}>⭐</Text>
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                  Leave a Review
+                </Text>
+                <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                  Help others discover the weird
+                </Text>
+              </View>
+              <PlatformIcon name="star" size={24} color="#FFD700" />
+            </TouchableOpacity>
+          )}
 
         </View>
 
