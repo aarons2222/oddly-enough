@@ -164,23 +164,9 @@ export function SettingsModal({ visible, onClose }: Props) {
   ];
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <Animated.View style={[styles.overlay, { opacity: bgOpacity }]}>
-        <TouchableOpacity style={StyleSheet.absoluteFill} onPress={handleClose} activeOpacity={1} />
-      </Animated.View>
-      
-      <Animated.View 
-        style={[
-          styles.container, 
-          { 
-            backgroundColor: theme.background,
-            paddingTop: insets.top + 16,
-            paddingBottom: insets.bottom + 20,
-            transform: [{ scale: scaleAnim }],
-            opacity: scaleAnim,
-          }
-        ]}
-      >
+    <Modal visible={visible} transparent={false} animationType="slide" onRequestClose={handleClose} statusBarTranslucent>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 20, flex: 1 }}>
         {/* Floating background emojis */}
         {bgEmojis.map((e, i) => (
           <FloatingEmoji key={i} emoji={e.emoji} startX={e.x} startY={e.y} delay={i * 100} />
@@ -352,7 +338,8 @@ export function SettingsModal({ visible, onClose }: Props) {
             Made with 👽 in a parallel dimension
           </Text>
         </View>
-      </Animated.View>
+        </View>
+      </View>
     </Modal>
   );
 }
