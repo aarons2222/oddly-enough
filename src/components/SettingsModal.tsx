@@ -290,11 +290,6 @@ export function SettingsModal({ visible, onClose }: Props) {
               </Animated.View>
             </AnimatedCard>
 
-            {/* Divider */}
-            <View style={[styles.divider, { backgroundColor: isDarkMode ? '#222' : '#e0e0e0' }]}>
-              <Text style={styles.dividerText}>Support the Weirdness</Text>
-            </View>
-
             {/* Feed the News Goblins Card */}
             <AnimatedCard index={3} visible={visible}>
               <TouchableOpacity 
