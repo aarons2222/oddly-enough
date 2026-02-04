@@ -19,7 +19,7 @@ import { ArticleCard } from '../components/ArticleCard';
 import { CategoryFilter, SortOption } from '../components/CategoryFilter';
 import { AdBanner } from '../components/AdBanner';
 import { AnimatedCard } from '../components/AnimatedCard';
-import { SkeletonCard } from '../components/SkeletonCard';
+import { WeirdLoader } from '../components/WeirdLoader';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
 import { SettingsModal } from '../components/SettingsModal';
@@ -351,11 +351,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       />
       
       {loading ? (
-        <View style={styles.skeletonContainer}>
-          <SkeletonCard theme={theme} />
-          <SkeletonCard theme={theme} />
-          <SkeletonCard theme={theme} />
-        </View>
+        <WeirdLoader theme={theme} />
       ) : (
         <FlatList
           data={articles}
