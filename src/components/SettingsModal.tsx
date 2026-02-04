@@ -173,7 +173,7 @@ export function SettingsModal({ visible, onClose }: Props) {
         style={[
           styles.container, 
           { 
-            backgroundColor: isDarkMode ? '#0a0a12' : '#f5f0ff',
+            backgroundColor: theme.background,
             paddingTop: insets.top + 16,
             paddingBottom: insets.bottom + 20,
             transform: [{ scale: scaleAnim }],
@@ -196,8 +196,8 @@ export function SettingsModal({ visible, onClose }: Props) {
             <Text style={styles.sparkle}>✨</Text>
           </Animated.View>
           
-          <TouchableOpacity onPress={handleClose} style={[styles.closeButton, { backgroundColor: isDarkMode ? '#222' : '#ddd' }]} activeOpacity={0.8}>
-            <PlatformIcon name="close" size={20} color={isDarkMode ? '#fff' : '#333'} />
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
+            <PlatformIcon name="close" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -388,6 +388,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
