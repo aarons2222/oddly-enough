@@ -128,8 +128,10 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       console.log('Got stats:', stats);
       setArticleStats(stats);
       
-      // Store raw articles - sorting will be handled by the useEffect
+      // Store raw articles and set sorted articles directly
       setRawArticles(uniqueArticles);
+      const sorted = sortArticles(uniqueArticles, stats);
+      setArticles(sorted);
       
       // Preload ALL article content in background
       const urlsToPreload = uniqueArticles.map(a => a.url);
