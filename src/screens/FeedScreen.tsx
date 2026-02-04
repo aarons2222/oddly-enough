@@ -36,6 +36,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [articles, setArticles] = useState<Article[]>([]);
+  const [rawArticles, setRawArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [category, setCategory] = useState<Category>('all');
@@ -183,8 +184,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   }, [category, rawArticles, articleStats, sortArticles]);
 
   // Re-sort when sort option changes (without refetching)
-  const [rawArticles, setRawArticles] = useState<Article[]>([]);
-  
   useEffect(() => {
     if (rawArticles.length > 0) {
       const sorted = sortArticles(rawArticles, articleStats);
