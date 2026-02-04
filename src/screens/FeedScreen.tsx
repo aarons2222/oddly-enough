@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PlatformIcon } from '../components/PlatformIcon';
 import { Article, Category } from '../types/Article';
 import { fetchArticles, refreshArticles } from '../services/newsService';
+import { getCachedArticles } from '../services/cacheService';
 import { preloadArticleContent } from '../services/contentCache';
 import { fetchStats, trackEvent, ArticleStats } from '../services/statsService';
 import { ArticleCard } from '../components/ArticleCard';
@@ -134,7 +135,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       const urlsToPreload = uniqueArticles.map(a => a.url);
       preloadArticleContent(urlsToPreload, 'https://oddly-enough-api.vercel.app');
     } catch (error) {
-      // Error loading articles
+      console.error('Error loading articles:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -144,22 +145,26 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   // Initial load - try cache first for instant display
   useEffect(() => {
     const initLoad = async () => {
-      // Import getCachedArticles for direct cache check
-      const { getCachedArticles } = await import('../services/cacheService');
-      const cached = await getCachedArticles();
-      
-      if (cached && cached.length > 0) {
-        // Show cached immediately without loading state
-        const uniqueArticles = deduplicateArticles(cached);
-        setRawArticles(uniqueArticles);
-        setArticles(uniqueArticles);
-        setLoading(false);
+      try {
+        const cached = await getCachedArticles();
         
-        // Then refresh in background
-        loadArticles(false);
-      } else {
-        // No cache, show loader and fetch
-        loadArticles(true);
+        if (cached && cached.length > 0) {
+          // Show cached immediately without loading state
+          const uniqueArticles = deduplicateArticles(cached);
+          setRawArticles(uniqueArticles);
+          setArticles(uniqueArticles);
+          setLoading(false);
+          
+          // Then refresh in background
+          loadArticles(false);
+        } else {
+          // No cache, show loader and fetch
+          await loadArticles(true);
+        }
+      } catch (error) {
+        console.error('Init load error:', error);
+        // Still try to load articles even if cache fails
+        await loadArticles(true);
       }
     };
     
