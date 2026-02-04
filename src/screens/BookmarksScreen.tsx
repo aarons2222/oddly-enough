@@ -57,7 +57,7 @@ export function BookmarksScreen({ onBack, onArticleSelect }: Props) {
           <PlatformIcon name="close" size={20} color="#fff" />
         </TouchableOpacity>
         <View style={styles.logoContainer}>
-          <Text style={[styles.logo, { color: theme.text }]}>Saved</Text>
+          <Text style={[styles.logo, { color: theme.text }]}>Stashed</Text>
           <Text style={styles.logoAccent}>Weirdness</Text>
         </View>
         <View style={styles.placeholder} />
