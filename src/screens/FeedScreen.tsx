@@ -113,27 +113,26 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
       
-      // Filter for selected category, then dedupe again
-      const filtered = category === 'all' 
-        ? uniqueAll 
-        : uniqueAll.filter(a => a.category === category);
-      
-      const uniqueArticles = deduplicateArticles(filtered);
-      
-      // Fetch social proof stats for articles
-      const articleIds = uniqueArticles.map(a => a.id);
+      // Fetch social proof stats for all articles
+      const articleIds = uniqueAll.map(a => a.id);
       console.log('Fetching stats for:', articleIds.slice(0, 5));
       const stats = await fetchStats(articleIds);
       console.log('Got stats:', stats);
       setArticleStats(stats);
       
-      // Store raw articles and set sorted articles directly
-      setRawArticles(uniqueArticles);
-      const sorted = sortArticles(uniqueArticles, stats);
+      // Store ALL raw articles (unfiltered) for category switching
+      setRawArticles(uniqueAll);
+      
+      // Filter for selected category
+      const filtered = category === 'all' 
+        ? uniqueAll 
+        : uniqueAll.filter(a => a.category === category);
+      
+      const sorted = sortArticles(filtered, stats);
       setArticles(sorted);
       
       // Preload ALL article content in background
-      const urlsToPreload = uniqueArticles.map(a => a.url);
+      const urlsToPreload = uniqueAll.map(a => a.url);
       preloadArticleContent(urlsToPreload, 'https://oddly-enough-api.vercel.app');
     } catch (error) {
       console.error('Error loading articles:', error);
@@ -172,14 +171,16 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     initLoad();
   }, []); // Only run once on mount
   
-  // Re-run when category changes
+  // Re-filter when category changes (no reload needed)
   useEffect(() => {
-    if (articles.length > 0) {
-      // Show loading state when switching categories
-      setLoading(true);
-      loadArticles(false);
+    if (rawArticles.length > 0) {
+      const filtered = category === 'all' 
+        ? rawArticles 
+        : rawArticles.filter(a => a.category === category);
+      const sorted = sortArticles(filtered, articleStats);
+      setArticles(sorted);
     }
-  }, [category]);
+  }, [category, rawArticles, articleStats, sortArticles]);
 
   // Re-sort when sort option changes (without refetching)
   const [rawArticles, setRawArticles] = useState<Article[]>([]);
