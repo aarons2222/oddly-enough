@@ -22,22 +22,21 @@ import { AnimatedCard } from '../components/AnimatedCard';
 import { WeirdLoader } from '../components/WeirdLoader';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
-import { SettingsModal } from '../components/SettingsModal';
 import { UfoAbduction } from '../components/UfoAbduction';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 interface Props {
   onArticleSelect: (article: Article) => void;
   onBookmarksPress: () => void;
+  onSettingsPress: () => void;
 }
 
-export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
+export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress }: Props) {
   const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [category, setCategory] = useState<Category>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -308,7 +307,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setShowSettings(true)} style={styles.headerButton}>
+      <TouchableOpacity onPress={onSettingsPress} style={styles.headerButton}>
         <PlatformIcon name="settings-outline" size={26} color={theme.text} />
       </TouchableOpacity>
     </View>
@@ -372,9 +371,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       
       {/* Bottom Ad Banner */}
       <AdBanner style={styles.adBanner} />
-      
-      {/* Settings Modal */}
-      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </SafeAreaView>
   );
 }

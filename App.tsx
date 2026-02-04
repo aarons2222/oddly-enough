@@ -9,6 +9,7 @@ import { Platform } from 'react-native';
 import { FeedScreen } from './src/screens/FeedScreen';
 import { ArticleScreen } from './src/screens/ArticleScreen';
 import { BookmarksScreen } from './src/screens/BookmarksScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
 import { WeirdSplash } from './src/components/WeirdSplash';
 import { AppProvider, useApp, lightTheme, darkTheme } from './src/context/AppContext';
 import { Article } from './src/types/Article';
@@ -18,7 +19,7 @@ if (Platform.OS !== 'web') {
   SplashScreen.preventAutoHideAsync();
 }
 
-type Screen = 'feed' | 'article' | 'bookmarks';
+type Screen = 'feed' | 'article' | 'bookmarks' | 'settings';
 
 const { width, height } = Dimensions.get('window');
 
@@ -37,6 +38,7 @@ function AppContent() {
   const articleOpacity = useRef(new Animated.Value(0)).current;
   const articleSlide = useRef(new Animated.Value(50)).current;
   const bookmarksScale = useRef(new Animated.Value(0)).current;
+  const settingsScale = useRef(new Animated.Value(0)).current;
 
   const navigateToArticle = (article: Article) => {
     setSelectedArticle(article);
@@ -119,6 +121,32 @@ function AppContent() {
     });
   };
 
+  const navigateToSettings = () => {
+    setPreviousScreen('feed');
+    setCurrentScreen('settings');
+    
+    // Scale/morph from button position (top-right area)
+    settingsScale.setValue(0);
+    Animated.spring(settingsScale, {
+      toValue: 1,
+      tension: 80,
+      friction: 10,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const navigateFromSettings = () => {
+    // Scale down back to button
+    Animated.timing(settingsScale, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => {
+      setCurrentScreen('feed');
+    });
+  };
+
   // Show splash screen on launch
   if (showSplash) {
     return (
@@ -138,6 +166,7 @@ function AppContent() {
         <FeedScreen 
           onArticleSelect={navigateToArticle} 
           onBookmarksPress={navigateToBookmarks}
+          onSettingsPress={navigateToSettings}
         />
       </View>
       
@@ -161,6 +190,26 @@ function AppContent() {
             onBack={navigateToFeed} 
             onArticleSelect={navigateToArticle}
           />
+        </Animated.View>
+      )}
+      
+      {/* Settings layer - morphs from button */}
+      {currentScreen === 'settings' && (
+        <Animated.View 
+          style={[
+            styles.settingsContainer,
+            { 
+              backgroundColor: theme.background,
+              transform: [
+                { translateX: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [width / 2 - 40, 0] }) },
+                { translateY: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [-height / 2 + 50, 0] }) },
+                { scale: settingsScale },
+              ],
+              opacity: settingsScale,
+            }
+          ]}
+        >
+          <SettingsScreen onBack={navigateFromSettings} />
         </Animated.View>
       )}
       
@@ -202,6 +251,13 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   bookmarksContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  settingsContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
