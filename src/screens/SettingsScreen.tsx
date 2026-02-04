@@ -134,9 +134,7 @@ export function SettingsScreen({ onBack }: Props) {
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.card }]}>
-        <TouchableOpacity onPress={onBack} style={styles.closeButton} activeOpacity={0.8}>
-          <PlatformIcon name="close" size={20} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.placeholder} />
         
         <Animated.View style={[styles.logoContainer, { transform: [{ rotate: titleRotate }, { scale: titleScale }] }]}>
           <Text style={[styles.logo, { color: theme.text }]}>Weird</Text>
@@ -144,7 +142,9 @@ export function SettingsScreen({ onBack }: Props) {
           <Text style={styles.sparkle}>✨</Text>
         </Animated.View>
         
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={onBack} style={styles.closeButton} activeOpacity={0.8}>
+          <PlatformIcon name="close" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
