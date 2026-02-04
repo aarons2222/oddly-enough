@@ -179,7 +179,6 @@ export function SettingsModal({ visible, onClose }: Props) {
           <Animated.View style={[styles.logoContainer, { transform: [{ rotate: titleRotate }, { scale: titleScale }] }]}>
             <Text style={[styles.logo, { color: theme.text }]}>Weird</Text>
             <Text style={styles.logoAccent}>Settings</Text>
-            <Text style={styles.sparkle}>✨</Text>
           </Animated.View>
           
           <TouchableOpacity onPress={handleClose} style={styles.closeButton} activeOpacity={0.8}>
