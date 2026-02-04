@@ -193,7 +193,7 @@ function AppContent() {
         </Animated.View>
       )}
       
-      {/* Settings layer - morphs from button */}
+      {/* Settings layer - morphs from gear button (top-right) */}
       {currentScreen === 'settings' && (
         <Animated.View 
           style={[
@@ -201,8 +201,8 @@ function AppContent() {
             { 
               backgroundColor: theme.background,
               transform: [
-                { translateX: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [width / 2 - 40, 0] }) },
-                { translateY: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [-height / 2 + 50, 0] }) },
+                { translateX: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [width / 2 - 50, 0] }) },
+                { translateY: settingsScale.interpolate({ inputRange: [0, 1], outputRange: [-height / 2 + 60, 0] }) },
                 { scale: settingsScale },
               ],
               opacity: settingsScale,
