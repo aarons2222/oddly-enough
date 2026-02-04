@@ -130,6 +130,15 @@ export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
   const [bugs, setBugs] = useState<Bug[]>([]);
   const bugIdRef = useRef(0);
   const bugCountRef = useRef(0); // Track active bugs
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear all bugs when chaos mode is turned off
+  useEffect(() => {
+    if (!chaosMode) {
+      setBugs([]);
+      bugCountRef.current = 0;
+    }
+  }, [chaosMode]);
 
   useEffect(() => {
     const spawnBug = () => {
@@ -192,16 +201,18 @@ export function ScreenBugs({ chaosMode = false }: ScreenBugsProps) {
       trySpawnBug();
       if (chaosMode) trySpawnBug();
       
-      const interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         trySpawnBug();
         if (chaosMode && Math.random() > 0.5) trySpawnBug();
       }, spawnInterval);
-
-      return () => clearInterval(interval);
     }, initialDelay);
 
     return () => {
       clearTimeout(initialTimeout);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       bugCountRef.current = 0;
     };
   }, [chaosMode]);
