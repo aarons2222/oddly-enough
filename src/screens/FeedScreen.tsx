@@ -106,7 +106,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
       // Fetch articles and add minimum delay for loading animation
       const [allData] = await Promise.all([
         fetchArticles('all'),
-        showLoader ? new Promise(resolve => setTimeout(resolve, 1200)) : Promise.resolve(),
+        showLoader ? new Promise(resolve => setTimeout(resolve, 5000)) : Promise.resolve(),
       ]);
       
       // Deduplicate TWICE - once on raw data, once after any transforms
