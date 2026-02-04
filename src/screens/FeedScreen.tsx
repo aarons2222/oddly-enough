@@ -170,6 +170,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   // Re-run when category changes
   useEffect(() => {
     if (articles.length > 0) {
+      // Show loading state when switching categories
+      setLoading(true);
       loadArticles(false);
     }
   }, [category]);
