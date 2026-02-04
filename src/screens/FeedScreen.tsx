@@ -103,11 +103,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   const loadArticles = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
-      // Fetch articles and add minimum delay for loading animation
-      const [allData] = await Promise.all([
-        fetchArticles('all'),
-        showLoader ? new Promise(resolve => setTimeout(resolve, 5000)) : Promise.resolve(),
-      ]);
+      // Fetch articles
+      const allData = await fetchArticles('all');
       
       // Deduplicate TWICE - once on raw data, once after any transforms
       const uniqueAll = deduplicateArticles(allData);
