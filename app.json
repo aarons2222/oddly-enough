@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oddly Enough",
     "slug": "oddly-enough",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -14,6 +14,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "uk.co.flatwhite.oddly",
+      "buildNumber": "1",
       "backgroundColor": "#121212",
       "icon": "./assets/icon.png",
       "infoPlist": {
@@ -25,7 +26,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121212"
       },
-      "package": "com.oddlyenough.app"
+      "package": "com.oddlyenough.app",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png",
