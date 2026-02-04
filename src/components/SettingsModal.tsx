@@ -231,7 +231,7 @@ export function SettingsModal({ visible, onClose }: Props) {
               style={[styles.card, { backgroundColor: isDarkMode ? '#2a1a2a' : '#fff0f8', borderColor: '#FFD700' }]}
               onPress={() => {
                 const storeUrl = Platform.OS === 'ios'
-                  ? 'https://apps.apple.com/app/id6741090498?action=write-review'
+                  ? 'https://apps.apple.com/app/id6758560461?action=write-review'
                   : 'market://details?id=com.oddlyenough.app';
                 Linking.openURL(storeUrl);
               }}
