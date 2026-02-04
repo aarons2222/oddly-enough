@@ -232,7 +232,32 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress }: Props) {
   };
 
   const handleReaction = (articleId: string, emoji: '🤯' | '😂' | '🤮') => {
-    // Track reaction for social proof
+    const previousReaction = getReaction(articleId);
+    
+    // Optimistically update local stats
+    setArticleStats(prev => {
+      const current = prev[articleId] || { views: 0, reactions: { '🤯': 0, '😂': 0, '🤮': 0 } };
+      const newReactions = { ...current.reactions };
+      
+      // If same emoji tapped again, remove it (toggle off)
+      if (previousReaction === emoji) {
+        newReactions[emoji] = Math.max(0, newReactions[emoji] - 1);
+      } else {
+        // Remove previous reaction if exists
+        if (previousReaction) {
+          newReactions[previousReaction as '🤯' | '😂' | '🤮'] = Math.max(0, newReactions[previousReaction as '🤯' | '😂' | '🤮'] - 1);
+        }
+        // Add new reaction
+        newReactions[emoji] = newReactions[emoji] + 1;
+      }
+      
+      return {
+        ...prev,
+        [articleId]: { ...current, reactions: newReactions }
+      };
+    });
+    
+    // Track reaction for social proof (fire and forget)
     trackEvent(articleId, 'reaction', emoji);
     setReaction(articleId, emoji);
   };
