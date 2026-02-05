@@ -100,48 +100,42 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     });
   }, [sortBy]);
 
-  const loadArticles = useCallback(async (showLoader = true) => {
-    if (showLoader) setLoading(true);
-    try {
-      // Fetch articles
-      const allData = await fetchArticles('all');
-      
-      // Deduplicate TWICE - once on raw data, once after any transforms
-      const uniqueAll = deduplicateArticles(allData);
-      
-      // Find which categories have articles
-      const categoriesWithArticles = new Set<Category>(['all']);
-      uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
-      setAvailableCategories(Array.from(categoriesWithArticles));
-      
-      // Fetch social proof stats for all articles
-      const articleIds = uniqueAll.map(a => a.id);
-      console.log('Fetching stats for:', articleIds.slice(0, 5));
-      const stats = await fetchStats(articleIds);
-      console.log('Got stats:', stats);
-      setArticleStats(stats);
-      
-      // Store ALL raw articles - filtering/sorting handled by useEffect
-      setRawArticles(uniqueAll);
-      
-      // Also set articles directly for initial display (newest first)
-      const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-      setArticles(sorted);
-      
-      // Preload ALL article content in background
-      const urlsToPreload = uniqueAll.map(a => a.url);
-      preloadArticleContent(urlsToPreload, 'https://oddly-enough-api.vercel.app');
-    } catch (error) {
-      console.error('Error loading articles:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  // Initial load
+  // Initial load - inline to avoid stale closure issues
   useEffect(() => {
-    loadArticles(true);
+    const doLoad = async () => {
+      setLoading(true);
+      try {
+        // Fetch articles
+        const allData = await fetchArticles('all');
+        
+        // Deduplicate
+        const uniqueAll = deduplicateArticles(allData);
+        
+        // Find which categories have articles
+        const categoriesWithArticles = new Set<Category>(['all']);
+        uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
+        setAvailableCategories(Array.from(categoriesWithArticles));
+        
+        // Fetch social proof stats
+        const articleIds = uniqueAll.map(a => a.id);
+        const stats = await fetchStats(articleIds);
+        setArticleStats(stats);
+        
+        // Store raw articles and set initial display
+        setRawArticles(uniqueAll);
+        const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+        setArticles(sorted);
+        
+        // Preload content in background
+        preloadArticleContent(uniqueAll.map(a => a.url), 'https://oddly-enough-api.vercel.app');
+      } catch (error) {
+        console.error('Error loading articles:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    doLoad();
   }, []);
   
   // Re-filter when category changes (no reload needed)
