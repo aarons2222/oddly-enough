@@ -39,14 +39,19 @@ const FALLBACK_ARTICLES: Article[] = [
 let memoryCache: Article[] | null = null;
 
 export async function fetchArticles(category: Category = 'all'): Promise<Article[]> {
+  console.log('[newsService] fetchArticles called, category:', category);
+  
   // 1. Try memory cache first (fastest)
   if (memoryCache && memoryCache.length > 0) {
+    console.log('[newsService] Using memory cache:', memoryCache.length, 'articles');
     return filterByCategory(memoryCache, category);
   }
   
   // 2. Try local storage cache
+  console.log('[newsService] Checking local storage cache...');
   const cachedArticles = await getCachedArticles();
   if (cachedArticles && cachedArticles.length > 0) {
+    console.log('[newsService] Using local cache:', cachedArticles.length, 'articles');
     memoryCache = cachedArticles;
     
     // Refresh in background
@@ -56,8 +61,10 @@ export async function fetchArticles(category: Category = 'all'): Promise<Article
   }
   
   // 3. Try API
+  console.log('[newsService] No cache, fetching from API...');
   try {
     const articles = await fetchArticlesFromAPI(category === 'all' ? 'all' : category);
+    console.log('[newsService] API returned:', articles?.length, 'articles');
     
     if (articles.length > 0) {
       memoryCache = articles;
@@ -65,10 +72,11 @@ export async function fetchArticles(category: Category = 'all'): Promise<Article
       return filterByCategory(articles, category);
     }
   } catch (error) {
-    console.error('API fetch failed:', error);
+    console.error('[newsService] API fetch failed:', error);
   }
   
   // 4. Last resort: fallback articles
+  console.log('[newsService] Using fallback articles');
   return filterByCategory(FALLBACK_ARTICLES, category);
 }
 

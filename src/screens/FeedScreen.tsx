@@ -103,11 +103,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   // Initial load - inline to avoid stale closure issues
   useEffect(() => {
     let isMounted = true;
+    console.log('[FeedScreen] Starting initial load...');
     
     const doLoad = async () => {
       try {
+        console.log('[FeedScreen] Fetching articles...');
         // Fetch articles
         const allData = await fetchArticles('all');
+        console.log('[FeedScreen] Got articles:', allData?.length);
         if (!isMounted) return;
         
         // Deduplicate
@@ -134,11 +137,15 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         console.error('Error loading articles:', error);
       }
       
+      console.log('[FeedScreen] Load complete, setting loading=false');
       // Always set loading to false
       if (isMounted) setLoading(false);
     };
     
-    doLoad();
+    doLoad().catch(err => {
+      console.error('[FeedScreen] doLoad error:', err);
+      if (isMounted) setLoading(false);
+    });
     
     return () => { isMounted = false; };
   }, []);
