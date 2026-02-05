@@ -121,15 +121,11 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       console.log('Got stats:', stats);
       setArticleStats(stats);
       
-      // Store ALL raw articles (unfiltered) for category switching
+      // Store ALL raw articles - filtering/sorting handled by useEffect
       setRawArticles(uniqueAll);
       
-      // Filter for selected category
-      const filtered = category === 'all' 
-        ? uniqueAll 
-        : uniqueAll.filter(a => a.category === category);
-      
-      const sorted = sortArticles(filtered, stats);
+      // Also set articles directly for initial display (newest first)
+      const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
       setArticles(sorted);
       
       // Preload ALL article content in background
@@ -141,36 +137,12 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       setLoading(false);
       setRefreshing(false);
     }
-  }, [category, sortArticles]);
+  }, []);
 
-  // Initial load - try cache first for instant display
+  // Initial load
   useEffect(() => {
-    const initLoad = async () => {
-      try {
-        const cached = await getCachedArticles();
-        
-        if (cached && cached.length > 0) {
-          // Show cached immediately without loading state
-          const uniqueArticles = deduplicateArticles(cached);
-          setRawArticles(uniqueArticles);
-          setArticles(uniqueArticles);
-          setLoading(false);
-          
-          // Then refresh in background
-          loadArticles(false);
-        } else {
-          // No cache, show loader and fetch
-          await loadArticles(true);
-        }
-      } catch (error) {
-        console.error('Init load error:', error);
-        // Still try to load articles even if cache fails
-        await loadArticles(true);
-      }
-    };
-    
-    initLoad();
-  }, []); // Only run once on mount
+    loadArticles(true);
+  }, []);
   
   // Re-filter when category changes (no reload needed)
   useEffect(() => {
