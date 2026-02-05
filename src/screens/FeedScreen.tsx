@@ -177,29 +177,28 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     try {
       // Force fresh fetch from API (bypass cache)
       const freshArticles = await refreshArticles();
-      const filtered = category === 'all' 
-        ? freshArticles 
-        : freshArticles.filter(a => a.category === category);
-      const uniqueArticles = deduplicateArticles(filtered);
+      const uniqueAll = deduplicateArticles(freshArticles);
       
       // Update available categories
       const categoriesWithArticles = new Set<Category>(['all']);
-      freshArticles.forEach(article => categoriesWithArticles.add(article.category));
+      uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
       
-      // Fetch stats
-      const articleIds = uniqueArticles.map(a => a.id);
-      const stats = await fetchStats(articleIds);
-      setArticleStats(stats);
+      // Store ALL raw articles and update display
+      setRawArticles(uniqueAll);
+      const filtered = category === 'all' 
+        ? uniqueAll 
+        : uniqueAll.filter(a => a.category === category);
+      const sorted = [...filtered].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+      setArticles(sorted);
       
-      // Store raw articles - sorting handled by useEffect
-      setRawArticles(uniqueArticles);
+      // Fetch stats in background (non-blocking)
+      fetchStats(uniqueAll.map(a => a.id)).then(stats => setArticleStats(stats));
       
-      // Preload content
-      const urlsToPreload = uniqueArticles.map(a => a.url);
-      preloadArticleContent(urlsToPreload, 'https://oddly-enough-api.vercel.app');
+      // Preload content in background
+      preloadArticleContent(uniqueAll.map(a => a.url), 'https://oddly-enough-api.vercel.app');
     } catch (error) {
-      // Refresh failed, keep current articles
+      console.error('Refresh failed:', error);
     } finally {
       setRefreshing(false);
     }
