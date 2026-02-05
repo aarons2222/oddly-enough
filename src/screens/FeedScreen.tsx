@@ -293,14 +293,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     </View>
   );
 
-  // Only show empty state if we've finished loading and truly have no articles
+  // Track if we've loaded articles at least once
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   
   useEffect(() => {
-    if (!loading && !hasLoadedOnce) {
+    if (articles.length > 0 && !hasLoadedOnce) {
       setHasLoadedOnce(true);
     }
-  }, [loading, hasLoadedOnce]);
+  }, [articles.length, hasLoadedOnce]);
 
   const renderEmpty = () => {
     // Don't show empty state until we've completed at least one load
@@ -329,7 +329,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         onSortChange={setSortBy}
       />
       
-      {loading && articles.length === 0 ? (
+      {loading && !hasLoadedOnce ? (
         <WeirdLoader theme={theme} />
       ) : (
         <FlatList
