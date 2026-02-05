@@ -330,7 +330,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         onSortChange={setSortBy}
       />
       
-      {loading ? (
+      {loading && articles.length === 0 ? (
         <WeirdLoader theme={theme} />
       ) : (
         <FlatList
