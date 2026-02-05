@@ -102,11 +102,13 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
 
   // Initial load - inline to avoid stale closure issues
   useEffect(() => {
+    let isMounted = true;
+    
     const doLoad = async () => {
-      setLoading(true);
       try {
         // Fetch articles
         const allData = await fetchArticles('all');
+        if (!isMounted) return;
         
         // Deduplicate
         const uniqueAll = deduplicateArticles(allData);
@@ -116,26 +118,29 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
         setAvailableCategories(Array.from(categoriesWithArticles));
         
-        // Fetch social proof stats
-        const articleIds = uniqueAll.map(a => a.id);
-        const stats = await fetchStats(articleIds);
-        setArticleStats(stats);
-        
         // Store raw articles and set initial display
         setRawArticles(uniqueAll);
         const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
         setArticles(sorted);
         
+        // Fetch stats in background (don't block loading)
+        fetchStats(uniqueAll.map(a => a.id)).then(stats => {
+          if (isMounted) setArticleStats(stats);
+        });
+        
         // Preload content in background
         preloadArticleContent(uniqueAll.map(a => a.url), 'https://oddly-enough-api.vercel.app');
       } catch (error) {
         console.error('Error loading articles:', error);
-      } finally {
-        setLoading(false);
       }
+      
+      // Always set loading to false
+      if (isMounted) setLoading(false);
     };
     
     doLoad();
+    
+    return () => { isMounted = false; };
   }, []);
   
   // Re-filter when category changes (no reload needed)
