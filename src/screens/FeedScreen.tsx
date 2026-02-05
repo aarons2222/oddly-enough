@@ -141,7 +141,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       setLoading(false);
       setRefreshing(false);
     }
-  }, [category]);
+  }, [category, sortArticles]);
 
   // Initial load - try cache first for instant display
   useEffect(() => {
@@ -186,10 +186,13 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   // Re-sort when sort option changes (without refetching)
   useEffect(() => {
     if (rawArticles.length > 0) {
-      const sorted = sortArticles(rawArticles, articleStats);
+      const filtered = category === 'all' 
+        ? rawArticles 
+        : rawArticles.filter(a => a.category === category);
+      const sorted = sortArticles(filtered, articleStats);
       setArticles(sorted);
     }
-  }, [sortBy, rawArticles, articleStats, sortArticles]);
+  }, [sortBy, category, rawArticles, articleStats, sortArticles]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
