@@ -38,6 +38,14 @@ const FALLBACK_ARTICLES: Article[] = [
 
 let memoryCache: Article[] | null = null;
 
+// Helper to add timeout to any promise
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))
+  ]);
+}
+
 export async function fetchArticles(category: Category = 'all'): Promise<Article[]> {
   console.log('[newsService] fetchArticles called, category:', category);
   
@@ -47,28 +55,37 @@ export async function fetchArticles(category: Category = 'all'): Promise<Article
     return filterByCategory(memoryCache, category);
   }
   
-  // 2. Try local storage cache
+  // 2. Try local storage cache (with timeout - AsyncStorage can hang on native)
   console.log('[newsService] Checking local storage cache...');
-  const cachedArticles = await getCachedArticles();
-  if (cachedArticles && cachedArticles.length > 0) {
-    console.log('[newsService] Using local cache:', cachedArticles.length, 'articles');
-    memoryCache = cachedArticles;
-    
-    // Refresh in background
-    fetchFromAPIInBackground();
-    
-    return filterByCategory(cachedArticles, category);
+  try {
+    const cachedArticles = await withTimeout(getCachedArticles(), 2000, null);
+    if (cachedArticles && cachedArticles.length > 0) {
+      console.log('[newsService] Using local cache:', cachedArticles.length, 'articles');
+      memoryCache = cachedArticles;
+      
+      // Refresh in background
+      fetchFromAPIInBackground();
+      
+      return filterByCategory(cachedArticles, category);
+    }
+  } catch (e) {
+    console.log('[newsService] Cache check failed, continuing to API');
   }
   
-  // 3. Try API
+  // 3. Try API (with timeout)
   console.log('[newsService] No cache, fetching from API...');
   try {
-    const articles = await fetchArticlesFromAPI(category === 'all' ? 'all' : category);
+    const articles = await withTimeout(
+      fetchArticlesFromAPI(category === 'all' ? 'all' : category),
+      5000,
+      [] as Article[]
+    );
     console.log('[newsService] API returned:', articles?.length, 'articles');
     
     if (articles.length > 0) {
       memoryCache = articles;
-      await setCachedArticles(articles);
+      // Don't await cache write - do it in background
+      setCachedArticles(articles).catch(() => {});
       return filterByCategory(articles, category);
     }
   } catch (error) {

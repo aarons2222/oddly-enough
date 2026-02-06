@@ -100,54 +100,92 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     });
   }, [sortBy]);
 
-  // Initial load - inline to avoid stale closure issues
+  // Initial load - with timeout fallback for native reliability
   useEffect(() => {
     let isMounted = true;
+    let loadingComplete = false;
     console.log('[FeedScreen] Starting initial load...');
+    
+    // Safety timeout - force stop loading after 8 seconds no matter what
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted && !loadingComplete) {
+        console.log('[FeedScreen] Safety timeout triggered - forcing loading=false');
+        setLoading(false);
+        loadingComplete = true;
+      }
+    }, 8000);
+    
+    const finishLoading = () => {
+      if (!loadingComplete && isMounted) {
+        console.log('[FeedScreen] Load complete, setting loading=false');
+        setLoading(false);
+        loadingComplete = true;
+        clearTimeout(safetyTimeout);
+      }
+    };
     
     const doLoad = async () => {
       try {
         console.log('[FeedScreen] Fetching articles...');
-        // Fetch articles
-        const allData = await fetchArticles('all');
+        
+        // Fetch with a timeout wrapper
+        const fetchWithTimeout = async () => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 6000);
+          
+          try {
+            const allData = await fetchArticles('all');
+            clearTimeout(timeout);
+            return allData;
+          } catch (e) {
+            clearTimeout(timeout);
+            throw e;
+          }
+        };
+        
+        const allData = await fetchWithTimeout();
         console.log('[FeedScreen] Got articles:', allData?.length);
-        if (!isMounted) return;
         
-        // Deduplicate
-        const uniqueAll = deduplicateArticles(allData);
+        if (!isMounted || loadingComplete) return;
         
-        // Find which categories have articles
-        const categoriesWithArticles = new Set<Category>(['all']);
-        uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
-        setAvailableCategories(Array.from(categoriesWithArticles));
-        
-        // Store raw articles and set initial display
-        setRawArticles(uniqueAll);
-        const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-        setArticles(sorted);
-        
-        // Fetch stats in background (don't block loading)
-        fetchStats(uniqueAll.map(a => a.id)).then(stats => {
-          if (isMounted) setArticleStats(stats);
-        });
-        
-        // Preload content in background
-        preloadArticleContent(uniqueAll.map(a => a.url), 'https://oddly-enough-api.vercel.app');
+        if (allData && allData.length > 0) {
+          // Deduplicate
+          const uniqueAll = deduplicateArticles(allData);
+          
+          // Find which categories have articles
+          const categoriesWithArticles = new Set<Category>(['all']);
+          uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
+          setAvailableCategories(Array.from(categoriesWithArticles));
+          
+          // Store raw articles and set initial display
+          setRawArticles(uniqueAll);
+          const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+          setArticles(sorted);
+          
+          // Fetch stats in background (don't block loading)
+          fetchStats(uniqueAll.map(a => a.id)).then(stats => {
+            if (isMounted) setArticleStats(stats);
+          }).catch(() => {}); // Ignore stats errors
+          
+          // Preload content in background
+          preloadArticleContent(uniqueAll.map(a => a.url), 'https://oddly-enough-api.vercel.app');
+        }
       } catch (error) {
-        console.error('Error loading articles:', error);
+        console.error('[FeedScreen] Error loading articles:', error);
       }
       
-      console.log('[FeedScreen] Load complete, setting loading=false');
-      // Always set loading to false
-      if (isMounted) setLoading(false);
+      finishLoading();
     };
     
     doLoad().catch(err => {
       console.error('[FeedScreen] doLoad error:', err);
-      if (isMounted) setLoading(false);
+      finishLoading();
     });
     
-    return () => { isMounted = false; };
+    return () => { 
+      isMounted = false; 
+      clearTimeout(safetyTimeout);
+    };
   }, []);
   
   // Re-filter when category changes (no reload needed)
