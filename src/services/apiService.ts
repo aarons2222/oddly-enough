@@ -4,23 +4,59 @@ import { Article, Category } from '../types/Article';
 const API_URL = 'https://oddly-enough-api.vercel.app';
 
 export async function fetchArticlesFromAPI(category: Category = 'all'): Promise<Article[]> {
+  const url = `${API_URL}/api/articles${category !== 'all' ? `?category=${category}` : ''}`;
+  console.log('[apiService] Fetching:', url);
+  
   try {
-    const url = `${API_URL}/api/articles${category !== 'all' ? `?category=${category}` : ''}`;
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    console.log('[apiService] Response status:', response.status);
+    console.log('[apiService] Response ok:', response.ok);
     
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('[apiService] Error response body:', errorText);
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
     
-    const data = await response.json();
+    const text = await response.text();
+    console.log('[apiService] Raw response length:', text.length);
+    console.log('[apiService] Raw response preview:', text.slice(0, 200));
+    
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      console.error('[apiService] JSON parse failed:', parseError);
+      throw new Error('Failed to parse API response as JSON');
+    }
+    
+    console.log('[apiService] Parsed data keys:', Object.keys(data));
+    console.log('[apiService] Articles count:', data.articles?.length);
+    
+    if (!data.articles || !Array.isArray(data.articles)) {
+      console.error('[apiService] No articles array in response:', data);
+      throw new Error('API response missing articles array');
+    }
     
     // Convert date strings to Date objects
-    return data.articles.map((article: any) => ({
+    const articles = data.articles.map((article: any) => ({
       ...article,
       publishedAt: new Date(article.publishedAt),
     }));
+    
+    console.log('[apiService] Returning', articles.length, 'articles');
+    return articles;
   } catch (error) {
-    console.error('API fetch error:', error);
+    console.error('[apiService] Fetch error:', error);
+    console.error('[apiService] Error name:', (error as Error).name);
+    console.error('[apiService] Error message:', (error as Error).message);
     throw error;
   }
 }
