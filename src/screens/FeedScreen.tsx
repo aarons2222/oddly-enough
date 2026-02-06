@@ -42,6 +42,15 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const [category, setCategory] = useState<Category>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [articleStats, setArticleStats] = useState<Record<string, ArticleStats>>({});
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  // Track when articles first load successfully
+  useEffect(() => {
+    if (articles.length > 0 && !hasLoadedOnce) {
+      console.log('[FeedScreen] First load complete, hasLoadedOnce=true');
+      setHasLoadedOnce(true);
+    }
+  }, [articles.length, hasLoadedOnce]);
 
   // Deduplicate articles by similar titles or same URL
   const deduplicateArticles = (articles: Article[]): Article[] => {
@@ -161,6 +170,10 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
           setRawArticles(uniqueAll);
           const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
           setArticles(sorted);
+          
+          // Mark as loaded (directly, don't rely only on useEffect)
+          setHasLoadedOnce(true);
+          console.log('[FeedScreen] Articles set, hasLoadedOnce=true');
           
           // Fetch stats in background (don't block loading)
           fetchStats(uniqueAll.map(a => a.id)).then(stats => {
@@ -333,15 +346,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       </TouchableOpacity>
     </View>
   );
-
-  // Track if we've loaded articles at least once
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  
-  useEffect(() => {
-    if (articles.length > 0 && !hasLoadedOnce) {
-      setHasLoadedOnce(true);
-    }
-  }, [articles.length, hasLoadedOnce]);
 
   const renderEmpty = () => {
     // Don't show empty state until we've completed at least one load
