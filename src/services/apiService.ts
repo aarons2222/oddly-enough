@@ -7,6 +7,10 @@ export async function fetchArticlesFromAPI(category: Category = 'all'): Promise<
   const url = `${API_URL}/api/articles${category !== 'all' ? `?category=${category}` : ''}`;
   console.log('[apiService] Fetching:', url);
   
+  // 8 second timeout - Vercel can be slow on cache miss
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -14,7 +18,9 @@ export async function fetchArticlesFromAPI(category: Category = 'all'): Promise<
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     
     console.log('[apiService] Response status:', response.status);
     console.log('[apiService] Response ok:', response.ok);
@@ -54,6 +60,7 @@ export async function fetchArticlesFromAPI(category: Category = 'all'): Promise<
     console.log('[apiService] Returning', articles.length, 'articles');
     return articles;
   } catch (error) {
+    clearTimeout(timeout);
     console.error('[apiService] Fetch error:', error);
     console.error('[apiService] Error name:', (error as Error).name);
     console.error('[apiService] Error message:', (error as Error).message);
