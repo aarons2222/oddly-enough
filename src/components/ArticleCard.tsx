@@ -1,4 +1,4 @@
-import React, { useState, useRef, memo } from 'react';
+import React, { useState, useRef, memo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,12 +25,16 @@ interface Props {
   stats?: ArticleStats;
 }
 
-// Chaos fonts
-const CHAOS_FONTS = ['normal', 'italic'];
-
 export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false, stats }: Props) {
   const [imageError, setImageError] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
+  const prevImageUrl = useRef(article.imageUrl);
+  
+  // Reset imageError when the image URL changes (e.g. after refresh)
+  if (prevImageUrl.current !== article.imageUrl) {
+    prevImageUrl.current = article.imageUrl;
+    if (imageError) setImageError(false);
+  }
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fabAnim = useRef(new Animated.Value(0)).current;
   const categoryInfo = CATEGORIES.find(c => c.id === article.category);
@@ -142,13 +146,6 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
       } catch (error) {
         console.error('Error sharing:', error);
       }
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    if (Platform.OS === 'web' && navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-      alert('Link copied to clipboard!');
     }
   };
 
