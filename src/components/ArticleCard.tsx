@@ -112,7 +112,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
   };
   
   // Generate a shareable link that opens in our app/web viewer (not the source)
-  const shareUrl = `https://oddly-enough.vercel.app/article.html?id=${encodeURIComponent(article.id)}`;
+  const shareUrl = `https://oddlyenough.news/article.html?id=${encodeURIComponent(article.id)}`;
   
   const handleShare = async () => {
     const shareText = `${article.title}\n\n${shareUrl}`;
