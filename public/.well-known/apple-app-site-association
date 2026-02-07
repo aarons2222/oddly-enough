@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "DT7Q5YWA83.uk.co.flatwhite.oddly",
+        "paths": [
+          "/article*",
+          "/article.html*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "DT7Q5YWA83.uk.co.flatwhite.oddly"
+    ]
+  }
+}

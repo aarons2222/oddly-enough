@@ -19,7 +19,11 @@
       "icon": "./assets/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "associatedDomains": [
+        "applinks:oddlyenough.news",
+        "webcredentials:oddlyenough.news"
+      ]
     },
     "android": {
       "adaptiveIcon": {

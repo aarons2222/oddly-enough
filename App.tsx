@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Animated, Dimensions, Easing, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Animated, Dimensions, Easing, ActivityIndicator, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
@@ -13,6 +13,8 @@ import { SettingsScreen } from './src/screens/SettingsScreen';
 import { WeirdSplash } from './src/components/WeirdSplash';
 import { AppProvider, useApp, lightTheme, darkTheme } from './src/context/AppContext';
 import { Article } from './src/types/Article';
+
+const API_BASE = 'https://oddly-enough-api.vercel.app';
 
 // Keep splash screen visible while loading fonts (only on native)
 if (Platform.OS !== 'web') {
@@ -146,6 +148,50 @@ function AppContent() {
       setCurrentScreen('feed');
     });
   };
+
+  // Deep link handler — opens article from Universal Links
+  const handleDeepLink = useCallback(async (url: string) => {
+    try {
+      const parsed = new URL(url);
+      if (!parsed.pathname.startsWith('/article')) return;
+      
+      const id = parsed.searchParams.get('id');
+      const sourceUrl = parsed.searchParams.get('url');
+      if (!id && !sourceUrl) return;
+
+      const param = id ? `id=${encodeURIComponent(id)}` : `url=${encodeURIComponent(sourceUrl!)}`;
+      const res = await fetch(`${API_BASE}/api/article?${param}`);
+      if (!res.ok) return;
+      
+      const data = await res.json();
+      if (!data.article) return;
+
+      const a = data.article;
+      const article: Article = {
+        id: a.id,
+        title: a.title,
+        summary: a.summary,
+        url: a.url,
+        imageUrl: a.imageUrl,
+        source: a.source,
+        category: a.category || 'world',
+        publishedAt: a.publishedAt,
+      };
+      navigateToArticle(article);
+    } catch (e) {
+      console.warn('Deep link failed:', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Handle app opened from a link
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink(url);
+    });
+    // Handle link when app is already open
+    const sub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+    return () => sub.remove();
+  }, [handleDeepLink]);
 
   // Show splash screen on launch
   if (showSplash) {
