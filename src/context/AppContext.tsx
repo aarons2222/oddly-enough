@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
+// useColorScheme removed — manual light/dark toggle only
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Article } from '../types/Article';
 
@@ -30,7 +30,6 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const systemColorScheme = useColorScheme();
   const [darkModePreference, setDarkModePrefState] = useState<DarkModePreference>('light');
   const [fontSize, setFontSizeState] = useState<FontSize>('medium');
   const [chaosMode, setChaosMode] = useState(false);
@@ -39,9 +38,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [reactions, setReactions] = useState<{ [articleId: string]: string }>({});
 
   // Calculate actual dark mode based on preference
-  const isDarkMode = 
-    darkModePreference === 'dark' ||
-    (darkModePreference === 'auto' && systemColorScheme === 'dark');
+  const isDarkMode = darkModePreference === 'dark';
 
   // Font scale multiplier
   const fontScale = fontSize === 'small' ? 0.8 : fontSize === 'large' ? 1.25 : 1;
@@ -50,8 +47,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadPreferences();
   }, []);
-
-  // Auto mode reacts to system changes via useColorScheme() — no polling needed
 
   const loadPreferences = async () => {
     try {
@@ -92,13 +87,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleDarkMode = () => {
-    // Cycle: light → dark → auto → light
-    const cycle: Record<DarkModePreference, DarkModePreference> = {
-      light: 'dark',
-      dark: 'auto',
-      auto: 'light',
-    };
-    setDarkModePreference(cycle[darkModePreference]);
+    setDarkModePreference(darkModePreference === 'light' ? 'dark' : 'light');
   };
 
   const setFontSize = async (size: FontSize) => {
