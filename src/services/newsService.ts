@@ -11,7 +11,7 @@ const FALLBACK_ARTICLES: Article[] = [
     url: 'https://www.bbc.co.uk/news/articles/c99k2m78dl2o',
     imageUrl: 'https://ichef.bbci.co.uk/ace/branded_news/1200/cpsprodpb/86c1/live/33837de0-fd28-11f0-890b-55ca0a00c59d.jpg',
     source: 'BBC',
-    category: 'animals',
+    category: 'beasts',
     publishedAt: new Date('2026-01-31'),
   },
   {
@@ -21,7 +21,7 @@ const FALLBACK_ARTICLES: Article[] = [
     url: 'https://www.upi.com/Odd_News/2026/01/30/belarus-raccoon-stowaway-shipped/7831769792654/',
     imageUrl: 'https://cdnph.upi.com/ph/st/th/7831769792654/2026/i/17697927912453/v1.5/Raccoon-stows-away-to-Belarus-in-shipped-car.jpg?lg=5',
     source: 'UPI',
-    category: 'animals',
+    category: 'beasts',
     publishedAt: new Date('2026-01-30'),
   },
   {
@@ -31,7 +31,7 @@ const FALLBACK_ARTICLES: Article[] = [
     url: 'https://www.mirror.co.uk/news/weird-news/dad-buys-pirate-ship-ebay-36634191',
     imageUrl: 'https://i2-prod.mirror.co.uk/article36635314.ece/ALTERNATES/s1200/622779517_10162341983697843_2559324211036302931_n.jpg',
     source: 'Mirror',
-    category: 'culture',
+    category: 'far-out',
     publishedAt: new Date('2026-01-29'),
   },
 ];

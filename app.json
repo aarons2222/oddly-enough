@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "uk.co.flatwhite.oddly",
-      "buildNumber": "37",
+      "buildNumber": "38",
       "backgroundColor": "#121212",
       "icon": "./assets/icon.png",
       "infoPlist": {

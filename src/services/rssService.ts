@@ -24,7 +24,7 @@ const RSS_FEEDS: { url: string; category: Category; source: string; alwaysOdd?: 
   // === BBC (filter for odd stories) ===
   { url: 'https://feeds.bbci.co.uk/news/england/rss.xml', category: 'viral', source: 'BBC' },
   { url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', category: 'animals', source: 'BBC' },
-  { url: 'https://feeds.bbci.co.uk/sport/rss.xml', category: 'sport', source: 'BBC Sport' },
+  { url: 'https://feeds.bbci.co.uk/sport/rss.xml', category: 'legends', source: 'BBC Sport' },
   
   // === ANIMALS ===
   { url: 'https://www.thedodo.com/rss', category: 'animals', source: 'The Dodo', alwaysOdd: true },

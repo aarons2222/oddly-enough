@@ -14,18 +14,16 @@ export interface Article {
 
 export type Category = 
   | 'all'
-  | 'animals'
-  | 'crime'
-  | 'culture'
-  | 'florida-man'
-  | 'food'
-  | 'mystery'
-  | 'nature'
-  | 'science'
-  | 'sports'
-  | 'tech'
-  | 'viral'
-  | 'world';
+  | 'bangers'
+  | 'beasts'
+  | 'bots'
+  | 'busted'
+  | 'far-out'
+  | 'grub'
+  | 'huh'
+  | 'legends'
+  | 'mad-science'
+  | 'oops';
 
 export interface NewsSource {
   id: string;
@@ -37,16 +35,14 @@ export interface NewsSource {
 
 export const CATEGORIES: { id: Category; label: string; emoji: string }[] = [
   { id: 'all', label: 'The Lot', emoji: '✨' },
-  { id: 'animals', label: 'Beasts', emoji: '🦔' },
-  { id: 'viral', label: 'Bangers', emoji: '🔥' },
-  { id: 'florida-man', label: 'Florida Man', emoji: '🐊' },
-  { id: 'science', label: 'Mad Science', emoji: '🧪' },
-  { id: 'mystery', label: 'Huh?', emoji: '👽' },
-  { id: 'sports', label: 'Mad Lads', emoji: '🏆' },
-  { id: 'tech', label: 'Bots & Bytes', emoji: '🤖' },
-  { id: 'crime', label: 'Busted', emoji: '🚨' },
-  { id: 'food', label: 'Grub', emoji: '🍕' },
-  { id: 'nature', label: 'Wild', emoji: '🌿' },
-  { id: 'culture', label: 'People', emoji: '🎭' },
-  { id: 'world', label: 'Far Out', emoji: '🌍' },
+  { id: 'bangers', label: 'Bangers', emoji: '🔥' },
+  { id: 'beasts', label: 'Beasts', emoji: '🦔' },
+  { id: 'oops', label: 'Oops', emoji: '🤦' },
+  { id: 'legends', label: 'Legends', emoji: '🏆' },
+  { id: 'huh', label: 'Huh?', emoji: '👽' },
+  { id: 'mad-science', label: 'Mad Science', emoji: '🧪' },
+  { id: 'busted', label: 'Busted', emoji: '🚨' },
+  { id: 'grub', label: 'Grub', emoji: '🍕' },
+  { id: 'bots', label: 'Bots', emoji: '🤖' },
+  { id: 'far-out', label: 'Far Out', emoji: '🌍' },
 ];
