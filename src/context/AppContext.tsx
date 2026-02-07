@@ -29,12 +29,6 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Check if it's "night time" (between 7pm and 7am)
-function isNightTime(): boolean {
-  const hour = new Date().getHours();
-  return hour >= 19 || hour < 7;
-}
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [darkModePreference, setDarkModePrefState] = useState<DarkModePreference>('light');
@@ -47,7 +41,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Calculate actual dark mode based on preference
   const isDarkMode = 
     darkModePreference === 'dark' ||
-    (darkModePreference === 'auto' && isNightTime());
+    (darkModePreference === 'auto' && systemColorScheme === 'dark');
 
   // Font scale multiplier
   const fontScale = fontSize === 'small' ? 0.8 : fontSize === 'large' ? 1.25 : 1;
@@ -57,17 +51,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     loadPreferences();
   }, []);
 
-  // Check time periodically for auto mode
-  useEffect(() => {
-    if (darkModePreference !== 'auto') return;
-    
-    const interval = setInterval(() => {
-      // Force re-render to update dark mode based on time
-      setDarkModePrefState(prev => prev);
-    }, 60000); // Check every minute
-    
-    return () => clearInterval(interval);
-  }, [darkModePreference]);
+  // Auto mode reacts to system changes via useColorScheme() — no polling needed
 
   const loadPreferences = async () => {
     try {
