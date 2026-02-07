@@ -19,6 +19,7 @@ const FALL_DURATION_MIN = 1200;
 const SPAWN_INTERVAL_START = 1200;
 const SPAWN_INTERVAL_MIN = 400;
 const LIVES_START = 3;
+const GAME_DURATION = 30; // seconds
 const HIGH_SCORE_KEY = 'oddity_catcher_high';
 
 // Weird things to catch = good
@@ -48,6 +49,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
   const [lives, setLives] = useState(LIVES_START);
   const [highScore, setHighScore] = useState(0);
   const [items, setItems] = useState<FallingItem[]>([]);
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [combo, setCombo] = useState('');
   const [comboOpacity] = useState(new Animated.Value(0));
 
@@ -58,6 +60,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
   const livesRef = useRef(LIVES_START);
   const gameStateRef = useRef<'ready' | 'playing' | 'over'>('ready');
   const itemsRef = useRef<FallingItem[]>([]);
+  const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const titleBounce = useRef(new Animated.Value(0)).current;
 
   // Load high score
@@ -79,6 +82,25 @@ export function OddityCatcher({ theme, onClose }: Props) {
       loop.start();
       return () => loop.stop();
     }
+  }, [gameState]);
+
+  // Countdown timer during gameplay
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    
+    countdownTimer.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          endGame();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownTimer.current) clearInterval(countdownTimer.current);
+    };
   }, [gameState]);
 
   const showCombo = useCallback((text: string) => {
@@ -180,6 +202,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
     gameStateRef.current = 'over';
     setGameState('over');
     if (spawnTimer.current) clearTimeout(spawnTimer.current);
+    if (countdownTimer.current) clearInterval(countdownTimer.current);
 
     // Stop all animations
     itemsRef.current.forEach(item => {
@@ -203,6 +226,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
     setScore(0);
     setStreak(0);
     setLives(LIVES_START);
+    setTimeLeft(GAME_DURATION);
     setItems([]);
     setGameState('playing');
     gameStateRef.current = 'playing';
@@ -215,6 +239,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
   useEffect(() => {
     return () => {
       if (spawnTimer.current) clearTimeout(spawnTimer.current);
+      if (countdownTimer.current) clearInterval(countdownTimer.current);
       gameStateRef.current = 'over';
     };
   }, []);
@@ -233,7 +258,7 @@ export function OddityCatcher({ theme, onClose }: Props) {
           <Text style={styles.title}>🛸 ODDITY{'\n'}CATCHER 👽</Text>
         </Animated.View>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Catch the weird stuff!{'\n'}Avoid the boring stuff!
+          30 seconds. Catch the weird stuff!{'\n'}Avoid the boring stuff!
         </Text>
         <View style={styles.tutorialRow}>
           <View style={styles.tutorialItem}>
@@ -304,9 +329,14 @@ export function OddityCatcher({ theme, onClose }: Props) {
             <Text style={styles.hudStreak}>🔥{streak}</Text>
           )}
         </View>
-        <TouchableOpacity onPress={endGame} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Text style={styles.hudPause}>⏸</Text>
-        </TouchableOpacity>
+        <View style={styles.hudRight}>
+          <Text style={[styles.hudTimer, { color: timeLeft <= 5 ? '#FF5252' : theme.textSecondary }]}>
+            ⏱{timeLeft}s
+          </Text>
+          <TouchableOpacity onPress={endGame} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Text style={styles.hudPause}>⏸</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Game area */}
@@ -469,6 +499,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FF6B6B',
     fontWeight: '700',
+  },
+  hudRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  hudTimer: {
+    fontSize: 18,
+    fontWeight: '800',
+    fontVariant: ['tabular-nums'],
   },
   hudPause: {
     fontSize: 24,
