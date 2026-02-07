@@ -9,7 +9,7 @@ interface Props {
 // Real ad unit IDs
 const BANNER_ID = Platform.select({
   ios: 'ca-app-pub-2072049563537333/6144896352',
-  android: 'ca-app-pub-3940256099942544/6300978111', // TODO: create Android ad unit
+  android: 'ca-app-pub-2072049563537333/6173660408',
   default: '',
 });
 
