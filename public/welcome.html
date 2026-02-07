@@ -27,6 +27,16 @@ body{background:var(--dark);color:var(--text);font-family:'Inter',system-ui,sans
 h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;font-weight:700}
 a{color:var(--teal);text-decoration:none}
 
+/* ─── STARFIELD ─── */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ─── STATS BAR ─── */
+.stats-bar{background:linear-gradient(90deg,rgba(78,205,196,.08),rgba(255,107,107,.08),rgba(78,205,196,.08));border-top:1px solid var(--card-border);border-bottom:1px solid var(--card-border);padding:2rem 1rem;text-align:center}
+.stats-row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;max-width:600px;margin:0 auto}
+.stats-item{text-align:center}
+.stats-num{font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:700;background:linear-gradient(135deg,var(--teal),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stats-label{font-size:.85rem;color:var(--text-dim);margin-top:.2rem}
+
 /* ─── HERO ─── */
 .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;overflow:hidden}
 .hero-bg{position:absolute;inset:0;z-index:0}
@@ -138,6 +148,7 @@ section{padding:6rem 2rem}
 </style>
 </head>
 <body>
+<canvas id="starfield"></canvas>
 
 <!-- ─── HERO ─── -->
 <section class="hero">
@@ -154,6 +165,16 @@ section{padding:6rem 2rem}
     <span class="hero-secondary">Android coming soon</span>
   </div>
 </section>
+
+<!-- ─── STATS BAR ─── -->
+<div class="stats-bar">
+  <div class="stats-row">
+    <div class="stats-item"><div class="stats-num" data-count="60">0</div><div class="stats-label">stories daily</div></div>
+    <div class="stats-item"><div class="stats-num" data-count="12">0</div><div class="stats-label">news sources</div></div>
+    <div class="stats-item"><div class="stats-num" data-count="10">0</div><div class="stats-label">categories</div></div>
+    <div class="stats-item"><div class="stats-num" data-count="0" data-symbol="∞">∞</div><div class="stats-label">weirdness</div></div>
+  </div>
+</div>
 
 <!-- ─── FEATURES ─── -->
 <section>
@@ -296,6 +317,47 @@ section{padding:6rem 2rem}
 </footer>
 
 <script>
+// ─── Starfield ───
+(function(){
+  const c=document.getElementById('starfield'),ctx=c.getContext('2d');
+  let stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;init()}
+  function init(){
+    stars=[];
+    for(let i=0;i<120;i++){
+      stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.3,a:Math.random(),s:Math.random()*.003+.001,d:Math.random()>.5?1:-1});
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.s*s.d;
+      if(s.a>=1||s.a<=.1)s.d*=-1;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${s.a*.5})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize();draw();
+  window.addEventListener('resize',resize);
+})();
+
+// ─── Animated Counters ───
+(function(){
+  const nums=document.querySelectorAll('[data-count]');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting)return;
+      const el=e.target,target=+el.dataset.count,sym=el.dataset.symbol;
+      if(sym){obs.unobserve(el);return}
+      let cur=0;const step=Math.ceil(target/40);
+      const tick=()=>{cur=Math.min(cur+step,target);el.textContent=cur+'+';if(cur<target)requestAnimationFrame(tick)};
+      tick();obs.unobserve(el);
+    });
+  },{threshold:.5});
+  nums.forEach(n=>obs.observe(n));
+})();
+
 // ─── Floating Emojis ───
 (function(){
   const emojis=['👽','🛸','🦆','🔮','🌀','💀','🐙','👁️','🪿','🦑','🎪','🌈'];
