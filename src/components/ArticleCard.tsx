@@ -183,7 +183,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         ]}
       >
       <View style={styles.imageContainer}>
-        {article.imageUrl && article.imageUrl.length > 0 && !imageError && !article.imageUrl.includes('dummyimage') ? (
+        {article.imageUrl && article.imageUrl.length > 0 && !imageError && !article.imageUrl.includes('dummyimage') && !article.imageUrl.includes('placehold') ? (
           <Image 
             source={article.imageUrl}
             style={styles.image}
@@ -194,7 +194,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         ) : null}
         
         {/* Funky placeholder when no image, image failed, or placeholder URL */}
-        {(!article.imageUrl || imageError || article.imageUrl.includes('dummyimage')) && (
+        {(!article.imageUrl || imageError || article.imageUrl.includes('dummyimage') || article.imageUrl.includes('placehold')) && (
           <View style={[styles.image, styles.placeholderImage, { backgroundColor: PLACEHOLDER_COLORS[Math.abs(article.title.length) % PLACEHOLDER_COLORS.length][0] }]}>
             <View style={[styles.placeholderPattern]}>
               {[...Array(6)].map((_, i) => (
