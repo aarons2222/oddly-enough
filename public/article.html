@@ -282,20 +282,12 @@
           html += `<div class="summary">${escapeHtml(a.summary)}</div>`;
         }
         
-        // Content
-        if (a.content && a.content !== a.summary) {
-          // Split into paragraphs
-          const paragraphs = a.content.split(/\n\n|\n/).filter(p => p.trim());
-          html += '<div class="content">';
-          paragraphs.forEach(p => {
-            html += `<p>${escapeHtml(p.trim())}</p>`;
-          });
-          html += '</div>';
-        }
+        // Content — loading placeholder, filled async
+        html += '<div id="article-content" class="content"><p style="color:#666;font-style:italic;">Loading full story...</p></div>';
         
-        // Source link
+        // Source link — prominent CTA to read full article
         html += `<a href="${a.url}" target="_blank" rel="noopener" class="source-link">
-          Read original on ${escapeHtml(a.source)} →
+          Read full story on ${escapeHtml(a.source)} →
         </a>`;
         
         // Weirdness meter
@@ -314,6 +306,11 @@
         
         document.getElementById('content').innerHTML = html;
         document.getElementById('cta').style.display = 'flex';
+        
+        // Fetch full article content from source
+        if (a.url) {
+          fetchSourceContent(a.url);
+        }
         
       } catch (e) {
         console.error('Failed to load article:', e);
@@ -350,6 +347,23 @@
       el.setAttribute('content', content);
     }
     
+    async function fetchSourceContent(sourceUrl) {
+      const el = document.getElementById('article-content');
+      if (!el) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/content?url=${encodeURIComponent(sourceUrl)}`);
+        const data = await res.json();
+        if (data.content) {
+          const paragraphs = data.content.split(/\n\n/).filter(p => p.trim());
+          el.innerHTML = paragraphs.map(p => `<p>${escapeHtml(p.trim())}</p>`).join('');
+        } else {
+          el.innerHTML = '';
+        }
+      } catch (e) {
+        el.innerHTML = '';
+      }
+    }
+
     loadArticle();
   </script>
 </body>
