@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Article } from '../types/Article';
@@ -142,9 +142,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const isBookmarked = (articleId: string) => {
+  const isBookmarked = useCallback((articleId: string) => {
     return bookmarks.some(a => a.id === articleId);
-  };
+  }, [bookmarks]);
 
   const setReaction = async (articleId: string, emoji: string) => {
     const newReactions = { ...reactions };
@@ -162,31 +162,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const getReaction = (articleId: string) => {
+  const getReaction = useCallback((articleId: string) => {
     return reactions[articleId];
-  };
+  }, [reactions]);
+
+  // Memoize context value to prevent cascading re-renders
+  const value = useMemo(() => ({
+    isDarkMode,
+    darkModePreference,
+    setDarkModePreference,
+    toggleDarkMode,
+    fontSize,
+    setFontSize,
+    fontScale,
+    chaosMode,
+    setChaosMode,
+    bugsEnabled,
+    setBugsEnabled,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    isBookmarked,
+    reactions,
+    setReaction,
+    getReaction,
+  }), [isDarkMode, darkModePreference, fontSize, fontScale, chaosMode, 
+       bugsEnabled, bookmarks, reactions, isBookmarked, getReaction]);
 
   return (
-    <AppContext.Provider value={{
-      isDarkMode,
-      darkModePreference,
-      setDarkModePreference,
-      toggleDarkMode,
-      fontSize,
-      setFontSize,
-      fontScale,
-      chaosMode,
-      setChaosMode,
-      bugsEnabled,
-      setBugsEnabled,
-      bookmarks,
-      addBookmark,
-      removeBookmark,
-      isBookmarked,
-      reactions,
-      setReaction,
-      getReaction,
-    }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

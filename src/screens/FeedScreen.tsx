@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,10 @@ import { ScreenBugs } from '../components/ScreenBugs';
 import { UfoAbduction } from '../components/UfoAbduction';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
+// Stable references outside component to prevent re-renders
+const keyExtractor = (item: Article) => item.id;
+const listFooter = <View style={{ height: 80 }} />;
+
 interface Props {
   onArticleSelect: (article: Article) => void;
   onBookmarksPress: () => void;
@@ -35,7 +39,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
-  const [articles, setArticles] = useState<Article[]>([]);
   const [rawArticles, setRawArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,14 +46,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [articleStats, setArticleStats] = useState<Record<string, ArticleStats>>({});
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-
-  // Track when articles first load successfully
-  useEffect(() => {
-    if (articles.length > 0 && !hasLoadedOnce) {
-      console.log('[FeedScreen] First load complete, hasLoadedOnce=true');
-      setHasLoadedOnce(true);
-    }
-  }, [articles.length, hasLoadedOnce]);
 
   // Deduplicate articles by similar titles or same URL
   const deduplicateArticles = (articles: Article[]): Article[] => {
@@ -74,8 +69,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         .replace(/\s+/g, ' ')
         .trim();
       
-      // Create a key from first 3 words (more aggressive dedup)
-      const titleKey = normalizedTitle.split(' ').slice(0, 3).join(' ');
+      // Create a key from first 5 words (balanced dedup — 3 was too aggressive)
+      const titleKey = normalizedTitle.split(' ').slice(0, 5).join(' ');
       
       if (!seenTitles.has(titleKey)) {
         seenTitles.set(titleKey, article);
@@ -166,12 +161,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
           uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
           setAvailableCategories(Array.from(categoriesWithArticles));
           
-          // Store raw articles and set initial display
+          // Store raw articles (articles list is derived via useMemo)
           setRawArticles(uniqueAll);
-          const sorted = [...uniqueAll].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-          setArticles(sorted);
-          
-          // Mark as loaded (directly, don't rely only on useEffect)
           setHasLoadedOnce(true);
           console.log('[FeedScreen] Articles set, hasLoadedOnce=true');
           
@@ -201,27 +192,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     };
   }, []);
   
-  // Re-filter when category changes (no reload needed)
-  useEffect(() => {
-    if (rawArticles.length > 0) {
-      const filtered = category === 'all' 
-        ? rawArticles 
-        : rawArticles.filter(a => a.category === category);
-      const sorted = sortArticles(filtered, articleStats);
-      setArticles(sorted);
-    }
-  }, [category, rawArticles, articleStats, sortArticles]);
-
-  // Re-sort when sort option changes (without refetching)
-  useEffect(() => {
-    if (rawArticles.length > 0) {
-      const filtered = category === 'all' 
-        ? rawArticles 
-        : rawArticles.filter(a => a.category === category);
-      const sorted = sortArticles(filtered, articleStats);
-      setArticles(sorted);
-    }
-  }, [sortBy, category, rawArticles, articleStats, sortArticles]);
+  // Derive filtered/sorted articles (replaces two duplicate useEffects)
+  const articles = useMemo(() => {
+    if (rawArticles.length === 0) return [];
+    const filtered = category === 'all' 
+      ? rawArticles 
+      : rawArticles.filter(a => a.category === category);
+    return sortArticles(filtered, articleStats);
+  }, [category, sortBy, rawArticles, articleStats, sortArticles]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -235,13 +213,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       uniqueAll.forEach(article => categoriesWithArticles.add(article.category));
       setAvailableCategories(Array.from(categoriesWithArticles));
       
-      // Store ALL raw articles and update display
+      // Store raw articles (articles list is derived via useMemo)
       setRawArticles(uniqueAll);
-      const filtered = category === 'all' 
-        ? uniqueAll 
-        : uniqueAll.filter(a => a.category === category);
-      const sorted = [...filtered].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
-      setArticles(sorted);
       
       // Fetch stats in background (non-blocking)
       fetchStats(uniqueAll.map(a => a.id)).then(stats => setArticleStats(stats));
@@ -304,7 +277,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     setCategory(newCategory);
   };
 
-  const renderArticle = ({ item, index }: { item: Article; index: number }) => {
+  const renderArticle = useCallback(({ item, index }: { item: Article; index: number }) => {
     // Chaos mode: random slight rotation for each card
     const chaosRotation = chaosMode ? (Math.sin(index * 1.5) * 2) : 0;
     const chaosScale = chaosMode ? (0.98 + Math.cos(index * 2) * 0.02) : 1;
@@ -327,7 +300,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         </UfoAbduction>
       </AnimatedCard>
     );
-  };
+  }, [chaosMode, articleStats, theme, isBookmarked, getReaction]);
 
   const renderHeader = () => (
     <View style={[styles.header, { backgroundColor: theme.card }]}>
@@ -380,8 +353,12 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         <FlatList
           data={articles}
           renderItem={renderArticle}
-          keyExtractor={(item) => item.id}
+          keyExtractor={keyExtractor}
           contentContainerStyle={styles.listContent}
+          windowSize={5}
+          maxToRenderPerBatch={5}
+          initialNumToRender={6}
+          removeClippedSubviews={Platform.OS !== 'web'}
           onScrollEndDrag={(e) => {
             if (e.nativeEvent.contentOffset.y < -80 && !refreshing) {
               handleRefresh();
@@ -389,7 +366,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
           }}
           ListHeaderComponent={refreshing ? <UfoRefresh refreshing={refreshing} /> : null}
           ListEmptyComponent={renderEmpty}
-          ListFooterComponent={() => <View style={{ height: 80 }} />}
+          ListFooterComponent={listFooter}
           showsVerticalScrollIndicator={false}
         />
       )}
@@ -437,30 +414,12 @@ const styles = StyleSheet.create({
     color: '#888',
     marginLeft: 8,
   },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
   headerButton: {
     padding: 8,
   },
   listContent: {
     paddingVertical: 8,
     paddingBottom: 100,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-  },
-  skeletonContainer: {
-    flex: 1,
-    paddingTop: 8,
   },
   emptyContainer: {
     flex: 1,

@@ -31,19 +31,24 @@ function FloatingEmoji({ emoji, delay, startX, startY }: { emoji: string; delay:
   useEffect(() => {
     Animated.timing(opacity, { toValue: 0.15, duration: 500, delay, useNativeDriver: true }).start();
     
-    Animated.loop(
+    const floatAnim = Animated.loop(
       Animated.sequence([
         Animated.timing(float, { toValue: -20, duration: 2500 + delay, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
         Animated.timing(float, { toValue: 0, duration: 2500 + delay, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
       ])
-    ).start();
+    );
     
-    Animated.loop(
+    const driftAnim = Animated.loop(
       Animated.sequence([
         Animated.timing(drift, { toValue: 10, duration: 3000 + delay, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
         Animated.timing(drift, { toValue: -10, duration: 3000 + delay, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
       ])
-    ).start();
+    );
+    
+    floatAnim.start();
+    driftAnim.start();
+    
+    return () => { floatAnim.stop(); driftAnim.stop(); };
   }, []);
 
   return (
@@ -96,19 +101,24 @@ export function SettingsScreen({ onBack }: Props) {
   const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
+    const wobble = Animated.loop(
       Animated.sequence([
         Animated.timing(titleWobble, { toValue: 1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
         Animated.timing(titleWobble, { toValue: -1, duration: 2000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
       ])
-    ).start();
+    );
     
-    Animated.loop(
+    const glow = Animated.loop(
       Animated.sequence([
         Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
         Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: true }),
       ])
-    ).start();
+    );
+    
+    wobble.start();
+    glow.start();
+    
+    return () => { wobble.stop(); glow.stop(); };
   }, []);
 
   const titleRotate = titleWobble.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-4deg', '0deg', '4deg'] });

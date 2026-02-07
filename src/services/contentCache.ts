@@ -8,7 +8,8 @@ interface CachedContent {
   timestamp: number;
 }
 
-// In-memory cache for faster access
+// In-memory cache for faster access (capped to prevent unbounded growth)
+const MAX_MEMORY_CACHE = 20;
 const memoryContentCache: Map<string, string> = new Map();
 
 export async function getCachedContent(articleUrl: string): Promise<string | null> {
@@ -50,6 +51,12 @@ export async function setCachedContent(articleUrl: string, content: string): Pro
     };
     
     await AsyncStorage.setItem(key, JSON.stringify(data));
+    
+    // Evict oldest entry if memory cache is full
+    if (memoryContentCache.size >= MAX_MEMORY_CACHE) {
+      const firstKey = memoryContentCache.keys().next().value;
+      if (firstKey) memoryContentCache.delete(firstKey);
+    }
     memoryContentCache.set(articleUrl, content);
   } catch (error) {
     console.error('Error writing content cache:', error);
@@ -78,15 +85,17 @@ export async function clearContentCache(): Promise<number> {
   return cleared;
 }
 
-// Preload content for multiple articles
+// Preload content for multiple articles (limited to top 10 for performance)
 export async function preloadArticleContent(
   articleUrls: string[],
   apiUrl: string
 ): Promise<void> {
+  // Only preload top 10 articles
+  const urlsToCheck = articleUrls.slice(0, 10);
   const uncachedUrls = [];
   
   // Check which ones need fetching
-  for (const url of articleUrls) {
+  for (const url of urlsToCheck) {
     const cached = await getCachedContent(url);
     if (!cached) {
       uncachedUrls.push(url);
@@ -97,16 +106,21 @@ export async function preloadArticleContent(
     return;
   }
   
-  // Fetch in parallel (limit to 5 at a time)
+  // Fetch in parallel (limit to 5 at a time) with per-fetch timeout
   const batchSize = 5;
   for (let i = 0; i < uncachedUrls.length; i += batchSize) {
     const batch = uncachedUrls.slice(i, i + batchSize);
     
     await Promise.all(batch.map(async (articleUrl) => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      
       try {
         const response = await fetch(
-          `${apiUrl}/api/content?url=${encodeURIComponent(articleUrl)}`
+          `${apiUrl}/api/content?url=${encodeURIComponent(articleUrl)}`,
+          { signal: controller.signal }
         );
+        clearTimeout(timeout);
         
         if (response.ok) {
           const data = await response.json();
@@ -115,6 +129,7 @@ export async function preloadArticleContent(
           }
         }
       } catch (error) {
+        clearTimeout(timeout);
         // Failed to preload silently
       }
     }));
