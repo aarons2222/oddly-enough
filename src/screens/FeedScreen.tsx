@@ -310,9 +310,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       <TouchableOpacity onPress={handleRefresh} style={styles.logoContainer} activeOpacity={0.7}>
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
-        {Platform.OS === 'web' && (
-          <Text style={styles.refreshHint}>↻</Text>
-        )}
       </TouchableOpacity>
       <TouchableOpacity onPress={onSettingsPress} style={styles.headerButton}>
         <PlatformIcon name="settings-outline" size={26} color={theme.text} />
@@ -408,11 +405,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#FF6B6B',
     marginLeft: 4,
-  },
-  refreshHint: {
-    fontSize: 18,
-    color: '#888',
-    marginLeft: 8,
   },
   headerButton: {
     padding: 8,
