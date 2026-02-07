@@ -158,43 +158,27 @@ export function SettingsScreen({ onBack }: Props) {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsContainer}>
-          {/* Dark Mode Preference Card */}
+          {/* Dark Mode Card */}
           <AnimatedCard index={0}>
-            <View style={[styles.card, styles.cardColumn, { backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', borderColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
-              <View style={styles.cardRow}>
-                <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#f0f0ff' }]}>
-                  <Text style={styles.cardEmoji}>{darkModePreference === 'dark' ? '🌙' : darkModePreference === 'auto' ? '🔄' : '☀️'}</Text>
-                </View>
-                <View style={styles.cardContent}>
-                  <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
-                    Appearance
-                  </Text>
-                  <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
-                    Choose your vibe
-                  </Text>
-                </View>
+            <View style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', borderColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
+              <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#f0f0ff' }]}>
+                <Text style={styles.cardEmoji}>{isDarkMode ? '🌙' : '☀️'}</Text>
               </View>
-              <View style={styles.optionRow}>
-                {([
-                  { key: 'light' as const, label: 'Light ☀️' },
-                  { key: 'dark' as const, label: 'Dark 🌙' },
-                  { key: 'auto' as const, label: 'Auto 🔄' },
-                ]).map(opt => (
-                  <TouchableOpacity
-                    key={opt.key}
-                    style={[
-                      styles.optionButton,
-                      { backgroundColor: darkModePreference === opt.key ? '#FF6B6B' : (isDarkMode ? '#2a2a4e' : '#f0f0ff') },
-                    ]}
-                    onPress={() => setDarkModePreference(opt.key)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.optionText, { color: darkModePreference === opt.key ? '#fff' : (isDarkMode ? '#ccc' : '#444') }]}>
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              <View style={styles.cardContent}>
+                <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                  {isDarkMode ? 'Dark Side' : 'Light Side'}
+                </Text>
+                <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                  {isDarkMode ? 'Embrace the darkness' : 'Let there be light'}
+                </Text>
               </View>
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: '#ccc', true: '#6366F1' }}
+                thumbColor="#fff"
+                ios_backgroundColor="#ccc"
+              />
             </View>
           </AnimatedCard>
 
