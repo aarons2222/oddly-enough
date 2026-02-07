@@ -72,17 +72,13 @@ export async function fetchArticles(category: Category = 'all'): Promise<Article
     console.log('[newsService] Cache check failed, continuing to API');
   }
   
-  // 3. Try API (with timeout)
+  // 3. Try API (apiService has its own 8s timeout via AbortController)
   console.log('[newsService] No cache, fetching from API...');
   try {
-    const articles = await withTimeout(
-      fetchArticlesFromAPI(category === 'all' ? 'all' : category),
-      5000,
-      [] as Article[]
-    );
+    const articles = await fetchArticlesFromAPI(category === 'all' ? 'all' : category);
     console.log('[newsService] API returned:', articles?.length, 'articles');
     
-    if (articles.length > 0) {
+    if (articles && articles.length > 0) {
       memoryCache = articles;
       // Don't await cache write - do it in background
       setCachedArticles(articles).catch(() => {});

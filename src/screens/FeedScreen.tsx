@@ -110,14 +110,15 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     let loadingComplete = false;
     console.log('[FeedScreen] Starting initial load...');
     
-    // Safety timeout - force stop loading after 8 seconds no matter what
+    // Safety timeout - force stop loading after 12 seconds no matter what
+    // (API has 8s timeout, give it breathing room)
     const safetyTimeout = setTimeout(() => {
       if (isMounted && !loadingComplete) {
         console.log('[FeedScreen] Safety timeout triggered - forcing loading=false');
         setLoading(false);
         loadingComplete = true;
       }
-    }, 8000);
+    }, 12000);
     
     const finishLoading = () => {
       if (!loadingComplete && isMounted) {
@@ -132,22 +133,8 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       try {
         console.log('[FeedScreen] Fetching articles...');
         
-        // Fetch with a timeout wrapper
-        const fetchWithTimeout = async () => {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 6000);
-          
-          try {
-            const allData = await fetchArticles('all');
-            clearTimeout(timeout);
-            return allData;
-          } catch (e) {
-            clearTimeout(timeout);
-            throw e;
-          }
-        };
-        
-        const allData = await fetchWithTimeout();
+        // apiService handles its own 8s timeout — no extra wrapper needed
+        const allData = await fetchArticles('all');
         console.log('[FeedScreen] Got articles:', allData?.length);
         
         if (!isMounted || loadingComplete) return;
