@@ -16,7 +16,7 @@ import { preloadArticleContent } from '../services/contentCache';
 import { fetchStats, trackEvent, ArticleStats } from '../services/statsService';
 import { ArticleCard } from '../components/ArticleCard';
 import { CategoryFilter, SortOption } from '../components/CategoryFilter';
-import { AdBanner } from '../components/AdBanner';
+import { AdBanner, FeedAdBanner } from '../components/AdBanner';
 import { AnimatedCard } from '../components/AnimatedCard';
 import { WeirdLoader } from '../components/WeirdLoader';
 import { UfoRefresh } from '../components/UfoRefresh';
@@ -59,7 +59,6 @@ function deduplicateArticles(articles: Article[]): Article[] {
 }
 
 // Stable references outside component to prevent re-renders
-const keyExtractor = (item: Article) => item.id;
 const listFooter = <View style={{ height: 80 }} />;
 
 interface Props {
@@ -189,6 +188,22 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     return sortArticles(filtered, articleStats);
   }, [category, sortBy, rawArticles, articleStats, sortArticles]);
 
+  // Interleave ads every 5 articles
+  const AD_INTERVAL = 5;
+  type FeedItem = { type: 'article'; data: Article } | { type: 'ad'; id: string };
+  
+  const feedData: FeedItem[] = useMemo(() => {
+    const items: FeedItem[] = [];
+    articles.forEach((article, i) => {
+      items.push({ type: 'article', data: article });
+      // Insert ad after every AD_INTERVAL articles (not after the last one)
+      if ((i + 1) % AD_INTERVAL === 0 && i < articles.length - 1) {
+        items.push({ type: 'ad', id: `ad-${i}` });
+      }
+    });
+    return items;
+  }, [articles]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
@@ -271,21 +286,30 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     setCategory(newCategory);
   };
 
-  const renderArticle = useCallback(({ item, index }: { item: Article; index: number }) => {
+  const feedKeyExtractor = useCallback((item: FeedItem) => {
+    return item.type === 'ad' ? item.id : item.data.id;
+  }, []);
+
+  const renderFeedItem = useCallback(({ item, index }: { item: FeedItem; index: number }) => {
+    if (item.type === 'ad') {
+      return <FeedAdBanner />;
+    }
+    
+    const article = item.data;
     // Chaos mode: random slight rotation for each card
     const chaosRotation = chaosMode ? (Math.sin(index * 1.5) * 2) : 0;
     const chaosScale = chaosMode ? (0.98 + Math.cos(index * 2) * 0.02) : 1;
-    const stats = articleStats[item.id];
+    const stats = articleStats[article.id];
     
     return (
       <AnimatedCard index={index}>
-        <UfoAbduction enabled={chaosMode} articleId={item.id}>
+        <UfoAbduction enabled={chaosMode} articleId={article.id}>
           <View style={{ transform: [{ rotate: `${chaosRotation}deg` }, { scale: chaosScale }] }}>
             <ArticleCard
-              article={{ ...item, isBookmarked: isBookmarked(item.id), reaction: getReaction(item.id) }}
-              onPress={() => handleArticlePress(item)}
-              onBookmark={() => handleBookmark(item)}
-              onReact={(emoji) => handleReaction(item.id, emoji as '🤯' | '😂' | '🤮')}
+              article={{ ...article, isBookmarked: isBookmarked(article.id), reaction: getReaction(article.id) }}
+              onPress={() => handleArticlePress(article)}
+              onBookmark={() => handleBookmark(article)}
+              onReact={(emoji) => handleReaction(article.id, emoji as '🤯' | '😂' | '🤮')}
               theme={theme}
               chaosMode={chaosMode}
               stats={stats}
@@ -367,9 +391,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         <WeirdLoader theme={theme} />
       ) : (
         <FlatList
-          data={articles}
-          renderItem={renderArticle}
-          keyExtractor={keyExtractor}
+          data={feedData}
+          renderItem={renderFeedItem}
+          keyExtractor={feedKeyExtractor}
           contentContainerStyle={styles.listContent}
           windowSize={5}
           maxToRenderPerBatch={5}

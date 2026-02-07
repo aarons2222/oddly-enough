@@ -1,26 +1,101 @@
-import React from 'react';
-import { View, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Platform, StyleSheet } from 'react-native';
 
 interface Props {
   style?: any;
+  size?: 'banner' | 'largeBanner' | 'mediumRectangle';
 }
 
-// AdBanner - returns null on web, shows ads on native
-// AdMob only works on native builds (iOS/Android)
-export function AdBanner({ style }: Props) {
+// Test ad unit IDs (replace with real ones for production)
+const TEST_BANNER_ID = Platform.select({
+  ios: 'ca-app-pub-3940256099942544/2435281174',
+  android: 'ca-app-pub-3940256099942544/6300978111',
+  default: '',
+});
+
+let BannerAd: any = null;
+let BannerAdSize: any = null;
+let TestIds: any = null;
+
+// Only import on native platforms
+if (Platform.OS !== 'web') {
+  try {
+    const RNMA = require('react-native-google-mobile-ads');
+    BannerAd = RNMA.BannerAd;
+    BannerAdSize = RNMA.BannerAdSize;
+    TestIds = RNMA.TestIds;
+  } catch (e) {
+    console.log('[AdBanner] react-native-google-mobile-ads not available');
+  }
+}
+
+export function AdBanner({ style, size = 'banner' }: Props) {
+  const [adError, setAdError] = useState(false);
+
   // Web: no ads
-  if (Platform.OS === 'web') {
+  if (Platform.OS === 'web' || !BannerAd || adError) {
     return null;
   }
-  
-  // Native: ads will be added when building native app
-  // For now, return placeholder that will be replaced with real ads
-  return <View style={style} />;
+
+  const adSize = size === 'largeBanner' 
+    ? BannerAdSize.LARGE_BANNER 
+    : size === 'mediumRectangle'
+    ? BannerAdSize.MEDIUM_RECTANGLE
+    : BannerAdSize.BANNER;
+
+  return (
+    <View style={[styles.container, style]}>
+      <BannerAd
+        unitId={TEST_BANNER_ID}
+        size={adSize}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+        onAdFailedToLoad={(error: any) => {
+          console.log('[AdBanner] Failed to load:', error?.message);
+          setAdError(true);
+        }}
+      />
+    </View>
+  );
 }
 
-// Placeholder for interstitial ads
-export async function showInterstitialAd(): Promise<boolean> {
-  if (Platform.OS === 'web') return false;
-  // Will be implemented in native build
-  return false;
+// Inline banner for feed (between articles)
+export function FeedAdBanner() {
+  const [adError, setAdError] = useState(false);
+
+  if (Platform.OS === 'web' || !BannerAd || adError) {
+    return null;
+  }
+
+  return (
+    <View style={styles.feedAd}>
+      <BannerAd
+        unitId={TEST_BANNER_ID}
+        size={BannerAdSize.MEDIUM_RECTANGLE}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+        onAdFailedToLoad={(error: any) => {
+          console.log('[FeedAdBanner] Failed to load:', error?.message);
+          setAdError(true);
+        }}
+      />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  feedAd: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+});
