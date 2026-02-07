@@ -321,38 +321,9 @@ export function SettingsScreen({ onBack }: Props) {
             </TouchableOpacity>
           </AnimatedCard>
 
-          {/* Share App Card */}
-          <AnimatedCard index={5}>
-            <TouchableOpacity 
-              style={[styles.card, styles.actionCard, { backgroundColor: isDarkMode ? '#1a1a2e' : '#f0f0ff', borderColor: '#6366F1' }]}
-              onPress={() => {
-                const storeUrl = Platform.OS === 'ios'
-                  ? 'https://apps.apple.com/app/id6758560461'
-                  : Platform.OS === 'android'
-                    ? 'https://play.google.com/store/apps/details?id=com.oddlyenough.app'
-                    : 'https://oddlyenough.app';
-                Linking.openURL(storeUrl);
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
-                <Text style={styles.cardEmoji}>📲</Text>
-              </View>
-              <View style={styles.cardContent}>
-                <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
-                  Share the Weirdness
-                </Text>
-                <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
-                  Tell your friends about Oddly Enough
-                </Text>
-              </View>
-              <Text style={styles.actionArrow}>→</Text>
-            </TouchableOpacity>
-          </AnimatedCard>
-
           {/* Leave a Review Card - iOS/Android only */}
           {Platform.OS !== 'web' && (
-            <AnimatedCard index={6}>
+            <AnimatedCard index={5}>
               <TouchableOpacity 
                 style={[styles.card, styles.actionCard, { backgroundColor: isDarkMode ? '#2a2a1a' : '#fffef0', borderColor: '#FFD700' }]}
                 onPress={() => {

@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "uk.co.flatwhite.oddly",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "backgroundColor": "#121212",
       "icon": "./assets/icon.png",
       "infoPlist": {
@@ -27,7 +27,7 @@
         "backgroundColor": "#121212"
       },
       "package": "com.oddlyenough.app",
-      "versionCode": 1
+      "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png",
