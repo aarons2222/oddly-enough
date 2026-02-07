@@ -293,13 +293,13 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       return;
     }
     
-    // Reset counter after 3 seconds of no taps
+    // After 1.5s of no taps: reset counter + refresh on web
     logoTapTimer.current = setTimeout(() => {
+      if (logoTapCount.current < 10 && Platform.OS === 'web') {
+        handleRefresh();
+      }
       logoTapCount.current = 0;
-    }, 3000);
-    
-    // Still do refresh on single tap (only if not building toward easter egg)
-    // Actually, let's just count taps — refresh is on pull-down anyway
+    }, 1500);
   };
 
   const renderArticle = useCallback(({ item, index }: { item: Article; index: number }) => {
