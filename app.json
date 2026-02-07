@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oddly Enough",
     "slug": "oddly-enough",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -14,7 +14,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "uk.co.flatwhite.oddly",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "backgroundColor": "#121212",
       "icon": "./assets/icon.png",
       "infoPlist": {
