@@ -297,7 +297,7 @@ export function ArticleScreen({ article, onBack }: Props) {
         visible={showShareSheet}
         onClose={() => setShowShareSheet(false)}
         title={article.title}
-        url={article.url}
+        url={`https://oddlyenough.news/article?url=${encodeURIComponent(article.url)}`}
         summary={article.summary}
         imageUrl={article.imageUrl || undefined}
         source={article.source}
