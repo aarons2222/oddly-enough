@@ -15,6 +15,20 @@ import { formatDistanceToNow } from 'date-fns';
 import { Theme, lightTheme } from '../context/AppContext';
 import { ArticleStats, formatViews, getDominantReaction } from '../services/statsService';
 
+// Funky color pairs [background, accent] for placeholder cards
+const PLACEHOLDER_COLORS = [
+  ['#FF6B6B', '#FF8E8E'], // coral
+  ['#4ECDC4', '#6FE7DF'], // teal
+  ['#845EC2', '#A178DF'], // purple
+  ['#FF9671', '#FFB89A'], // peach
+  ['#00C9A7', '#33E0C0'], // mint
+  ['#FFC75F', '#FFD68A'], // gold
+  ['#D65DB1', '#E484CC'], // pink
+  ['#0081CF', '#339FDF'], // blue
+  ['#F9F871', '#FBFB9D'], // yellow
+  ['#FF6F91', '#FF95AD'], // rose
+];
+
 interface Props {
   article: Article & { reaction?: string };
   onPress: () => void;
@@ -169,7 +183,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         ]}
       >
       <View style={styles.imageContainer}>
-        {article.imageUrl && article.imageUrl.length > 0 && !imageError ? (
+        {article.imageUrl && article.imageUrl.length > 0 && !imageError && !article.imageUrl.includes('dummyimage') ? (
           <Image 
             source={article.imageUrl}
             style={styles.image}
@@ -179,11 +193,24 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           />
         ) : null}
         
-        {/* Always show placeholder behind image, visible when image fails or is loading */}
-        {(!article.imageUrl || imageError) && (
-          <View style={[styles.image, styles.placeholderImage]}>
+        {/* Funky placeholder when no image, image failed, or placeholder URL */}
+        {(!article.imageUrl || imageError || article.imageUrl.includes('dummyimage')) && (
+          <View style={[styles.image, styles.placeholderImage, { backgroundColor: PLACEHOLDER_COLORS[Math.abs(article.title.length) % PLACEHOLDER_COLORS.length][0] }]}>
+            <View style={[styles.placeholderPattern]}>
+              {[...Array(6)].map((_, i) => (
+                <View key={i} style={[styles.patternDot, { 
+                  backgroundColor: PLACEHOLDER_COLORS[Math.abs(article.title.length) % PLACEHOLDER_COLORS.length][1],
+                  left: `${(i * 23 + 10) % 90}%` as any,
+                  top: `${(i * 31 + 15) % 80}%` as any,
+                  width: 40 + (i * 13 % 30),
+                  height: 40 + (i * 13 % 30),
+                  borderRadius: 20 + (i * 7 % 15),
+                  opacity: 0.15 + (i * 0.05),
+                }]} />
+              ))}
+            </View>
             <Text style={styles.placeholderEmoji}>{categoryInfo?.emoji || '📰'}</Text>
-            <Text style={[styles.placeholderText, { color: '#FF6B6B' }]}>{article.source}</Text>
+            <Text style={[styles.placeholderText, { color: 'rgba(255,255,255,0.9)' }]}>{article.source}</Text>
           </View>
         )}
       </View>
@@ -304,15 +331,25 @@ const styles = StyleSheet.create({
   placeholderImage: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#2a2a2a',
+    overflow: 'hidden',
+  },
+  placeholderPattern: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  patternDot: {
+    position: 'absolute',
   },
   placeholderEmoji: {
     fontSize: 48,
-    marginBottom: 8,
+    marginBottom: 4,
+    zIndex: 1,
   },
   placeholderText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    zIndex: 1,
   },
   content: {
     padding: 16,
