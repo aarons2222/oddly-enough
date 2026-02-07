@@ -19,7 +19,7 @@ interface Props {
 }
 
 export function BookmarksScreen({ onBack, onArticleSelect }: Props) {
-  const { isDarkMode, bookmarks, removeBookmark, isBookmarked } = useApp();
+  const { isDarkMode, bookmarks, removeBookmark, isBookmarked, getReaction } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
 
   const handleBookmarkToggle = (articleId: string) => {
@@ -30,7 +30,7 @@ export function BookmarksScreen({ onBack, onArticleSelect }: Props) {
 
   const renderArticle = ({ item }: { item: Article }) => (
     <ArticleCard
-      article={{ ...item, isBookmarked: true }}
+      article={{ ...item, isBookmarked: true, reaction: getReaction(item.id) }}
       onPress={() => onArticleSelect(item)}
       onBookmark={() => handleBookmarkToggle(item.id)}
       theme={theme}

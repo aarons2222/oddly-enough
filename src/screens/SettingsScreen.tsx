@@ -94,7 +94,7 @@ function AnimatedCard({ children, index }: { children: React.ReactNode; index: n
 }
 
 export function SettingsScreen({ onBack }: Props) {
-  const { isDarkMode, toggleDarkMode, chaosMode, setChaosMode, bugsEnabled, setBugsEnabled } = useApp();
+  const { isDarkMode, toggleDarkMode, darkModePreference, setDarkModePreference, fontSize, setFontSize, chaosMode, setChaosMode, bugsEnabled, setBugsEnabled } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const titleWobble = useRef(new Animated.Value(0)).current;
@@ -158,32 +158,91 @@ export function SettingsScreen({ onBack }: Props) {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cardsContainer}>
-          {/* Dark Mode Card */}
+          {/* Dark Mode Preference Card */}
           <AnimatedCard index={0}>
-            <View style={[styles.card, { backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', borderColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
-              <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#f0f0ff' }]}>
-                <Text style={styles.cardEmoji}>{isDarkMode ? '🌙' : '☀️'}</Text>
+            <View style={[styles.card, styles.cardColumn, { backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', borderColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
+              <View style={styles.cardRow}>
+                <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#f0f0ff' }]}>
+                  <Text style={styles.cardEmoji}>{darkModePreference === 'dark' ? '🌙' : darkModePreference === 'auto' ? '🔄' : '☀️'}</Text>
+                </View>
+                <View style={styles.cardContent}>
+                  <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                    Appearance
+                  </Text>
+                  <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                    Choose your vibe
+                  </Text>
+                </View>
               </View>
-              <View style={styles.cardContent}>
-                <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
-                  {isDarkMode ? 'Dark Side' : 'Light Side'}
-                </Text>
-                <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
-                  {isDarkMode ? 'Embrace the darkness' : 'Let there be light'}
-                </Text>
+              <View style={styles.optionRow}>
+                {([
+                  { key: 'light' as const, label: 'Light ☀️' },
+                  { key: 'dark' as const, label: 'Dark 🌙' },
+                  { key: 'auto' as const, label: 'Auto 🔄' },
+                ]).map(opt => (
+                  <TouchableOpacity
+                    key={opt.key}
+                    style={[
+                      styles.optionButton,
+                      { backgroundColor: darkModePreference === opt.key ? '#FF6B6B' : (isDarkMode ? '#2a2a4e' : '#f0f0ff') },
+                    ]}
+                    onPress={() => setDarkModePreference(opt.key)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.optionText, { color: darkModePreference === opt.key ? '#fff' : (isDarkMode ? '#ccc' : '#444') }]}>
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-              <Switch
-                value={isDarkMode}
-                onValueChange={toggleDarkMode}
-                trackColor={{ false: '#ccc', true: '#6366F1' }}
-                thumbColor="#fff"
-                ios_backgroundColor="#ccc"
-              />
+            </View>
+          </AnimatedCard>
+
+          {/* Font Size Card */}
+          <AnimatedCard index={1}>
+            <View style={[styles.card, styles.cardColumn, { backgroundColor: isDarkMode ? '#1a2a2e' : '#fff', borderColor: isDarkMode ? '#2a4a4e' : '#e0f0ff' }]}>
+              <View style={styles.cardRow}>
+                <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a4a4e' : '#f0f8ff' }]}>
+                  <Text style={styles.cardEmoji}>🔤</Text>
+                </View>
+                <View style={styles.cardContent}>
+                  <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                    Font Size
+                  </Text>
+                  <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                    Make it readable
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.optionRow}>
+                {([
+                  { key: 'small' as const, label: 'Aa', sub: 'Small', size: 13 },
+                  { key: 'medium' as const, label: 'Aa', sub: 'Medium', size: 16 },
+                  { key: 'large' as const, label: 'Aa', sub: 'Large', size: 20 },
+                ]).map(opt => (
+                  <TouchableOpacity
+                    key={opt.key}
+                    style={[
+                      styles.optionButton,
+                      { backgroundColor: fontSize === opt.key ? '#FF6B6B' : (isDarkMode ? '#2a4a4e' : '#f0f8ff') },
+                    ]}
+                    onPress={() => setFontSize(opt.key)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.optionLabel, { fontSize: opt.size, color: fontSize === opt.key ? '#fff' : (isDarkMode ? '#ccc' : '#444') }]}>
+                      {opt.label}
+                    </Text>
+                    <Text style={[styles.optionSub, { color: fontSize === opt.key ? 'rgba(255,255,255,0.8)' : (isDarkMode ? '#888' : '#888') }]}>
+                      {opt.sub}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           </AnimatedCard>
 
           {/* Bugs Card */}
-          <AnimatedCard index={1}>
+          <AnimatedCard index={2}>
             <View style={[styles.card, { backgroundColor: isDarkMode ? '#1a2e1a' : '#fff', borderColor: isDarkMode ? '#2a4e2a' : '#e0ffe0' }]}>
               <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a4e2a' : '#f0fff0' }]}>
                 <Text style={styles.cardEmoji}>🐛</Text>
@@ -207,7 +266,7 @@ export function SettingsScreen({ onBack }: Props) {
           </AnimatedCard>
 
           {/* Chaos Mode Card */}
-          <AnimatedCard index={2}>
+          <AnimatedCard index={3}>
             <Animated.View 
               style={[
                 styles.card, 
@@ -241,7 +300,7 @@ export function SettingsScreen({ onBack }: Props) {
           </AnimatedCard>
 
           {/* Feed the News Goblins Card */}
-          <AnimatedCard index={3}>
+          <AnimatedCard index={4}>
             <TouchableOpacity 
               style={[styles.card, styles.actionCard, { backgroundColor: isDarkMode ? '#1a2a1a' : '#f0fff0', borderColor: '#4CAF50' }]}
               onPress={() => Linking.openURL('https://buymeacoffee.com/oddlyenough')}
@@ -262,9 +321,38 @@ export function SettingsScreen({ onBack }: Props) {
             </TouchableOpacity>
           </AnimatedCard>
 
+          {/* Share App Card */}
+          <AnimatedCard index={5}>
+            <TouchableOpacity 
+              style={[styles.card, styles.actionCard, { backgroundColor: isDarkMode ? '#1a1a2e' : '#f0f0ff', borderColor: '#6366F1' }]}
+              onPress={() => {
+                const storeUrl = Platform.OS === 'ios'
+                  ? 'https://apps.apple.com/app/id6758560461'
+                  : Platform.OS === 'android'
+                    ? 'https://play.google.com/store/apps/details?id=com.oddlyenough.app'
+                    : 'https://oddlyenough.app';
+                Linking.openURL(storeUrl);
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
+                <Text style={styles.cardEmoji}>📲</Text>
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
+                  Share the Weirdness
+                </Text>
+                <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
+                  Tell your friends about Oddly Enough
+                </Text>
+              </View>
+              <Text style={styles.actionArrow}>→</Text>
+            </TouchableOpacity>
+          </AnimatedCard>
+
           {/* Leave a Review Card - iOS/Android only */}
           {Platform.OS !== 'web' && (
-            <AnimatedCard index={4}>
+            <AnimatedCard index={6}>
               <TouchableOpacity 
                 style={[styles.card, styles.actionCard, { backgroundColor: isDarkMode ? '#2a2a1a' : '#fffef0', borderColor: '#FFD700' }]}
                 onPress={() => {
@@ -296,7 +384,7 @@ export function SettingsScreen({ onBack }: Props) {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: isDarkMode ? '#444' : '#aaa' }]}>
-          🛸 Oddly Enough v1.0.3
+          🛸 Oddly Enough v1.1.0
         </Text>
         <Text style={[styles.footerSubtext, { color: isDarkMode ? '#333' : '#bbb' }]}>
           Made with 👽 in a parallel dimension
@@ -359,6 +447,37 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     borderWidth: 2,
+  },
+  cardColumn: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  optionButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  optionLabel: {
+    fontWeight: '700',
+  },
+  optionSub: {
+    fontSize: 10,
+    marginTop: 2,
   },
   chaosCard: {
     shadowColor: '#9B59B6',

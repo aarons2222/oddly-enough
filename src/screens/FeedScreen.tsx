@@ -4,15 +4,14 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  RefreshControl,
   TouchableOpacity,
   Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PlatformIcon } from '../components/PlatformIcon';
-import { Article, Category } from '../types/Article';
+import { Article, Category, CATEGORIES } from '../types/Article';
 import { fetchArticles, refreshArticles } from '../services/newsService';
-import { getCachedArticles } from '../services/cacheService';
 import { preloadArticleContent } from '../services/contentCache';
 import { fetchStats, trackEvent, ArticleStats } from '../services/statsService';
 import { ArticleCard } from '../components/ArticleCard';
@@ -24,6 +23,40 @@ import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
 import { UfoAbduction } from '../components/UfoAbduction';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
+
+// Deduplicate articles by similar titles or same URL (pure function, no component dependency)
+function deduplicateArticles(articles: Article[]): Article[] {
+  const seenTitles = new Map<string, Article>();
+  const seenUrls = new Set<string>();
+  
+  for (const article of articles) {
+    // Normalize URL (handle bbc.co.uk vs bbc.com, etc)
+    const urlKey = article.url
+      .split('?')[0]
+      .replace(/\/$/, '')
+      .replace('bbc.co.uk', 'bbc.com')
+      .replace('www.', '');
+    
+    if (seenUrls.has(urlKey)) continue;
+    
+    // Normalize title: lowercase, remove punctuation, extra spaces
+    const normalizedTitle = article.title
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Create a key from first 5 words (balanced dedup — 3 was too aggressive)
+    const titleKey = normalizedTitle.split(' ').slice(0, 5).join(' ');
+    
+    if (!seenTitles.has(titleKey)) {
+      seenTitles.set(titleKey, article);
+      seenUrls.add(urlKey);
+    }
+  }
+  
+  return Array.from(seenTitles.values());
+}
 
 // Stable references outside component to prevent re-renders
 const keyExtractor = (item: Article) => item.id;
@@ -46,40 +79,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [articleStats, setArticleStats] = useState<Record<string, ArticleStats>>({});
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-
-  // Deduplicate articles by similar titles or same URL
-  const deduplicateArticles = (articles: Article[]): Article[] => {
-    const seenTitles = new Map<string, Article>();
-    const seenUrls = new Set<string>();
-    
-    for (const article of articles) {
-      // Normalize URL (handle bbc.co.uk vs bbc.com, etc)
-      const urlKey = article.url
-        .split('?')[0]
-        .replace(/\/$/, '')
-        .replace('bbc.co.uk', 'bbc.com')
-        .replace('www.', '');
-      
-      if (seenUrls.has(urlKey)) continue;
-      
-      // Normalize title: lowercase, remove punctuation, extra spaces
-      const normalizedTitle = article.title
-        .toLowerCase()
-        .replace(/[^\w\s]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      // Create a key from first 5 words (balanced dedup — 3 was too aggressive)
-      const titleKey = normalizedTitle.split(' ').slice(0, 5).join(' ');
-      
-      if (!seenTitles.has(titleKey)) {
-        seenTitles.set(titleKey, article);
-        seenUrls.add(urlKey);
-      }
-    }
-    
-    return Array.from(seenTitles.values());
-  };
+  const [loadError, setLoadError] = useState(false);
 
   const [availableCategories, setAvailableCategories] = useState<Category[]>(['all']);
 
@@ -176,6 +176,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         }
       } catch (error) {
         console.error('[FeedScreen] Error loading articles:', error);
+        if (isMounted) setLoadError(true);
       }
       
       finishLoading();
@@ -235,6 +236,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   };
 
   const handleBookmark = (article: Article) => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     if (isBookmarked(article.id)) {
       removeBookmark(article.id);
     } else {
@@ -243,6 +247,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   };
 
   const handleReaction = (articleId: string, emoji: '🤯' | '😂' | '🤮') => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     const previousReaction = getReaction(articleId);
     
     // Optimistically update local stats
@@ -302,7 +309,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     );
   }, [chaosMode, articleStats, theme, isBookmarked, getReaction]);
 
-  const renderHeader = () => (
+  const renderHeader = useCallback(() => (
     <View style={[styles.header, { backgroundColor: theme.card }]}>
       <TouchableOpacity onPress={onBookmarksPress} style={styles.headerButton}>
         <PlatformIcon name="bookmark" size={26} color={theme.text} />
@@ -315,9 +322,24 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         <PlatformIcon name="settings-outline" size={26} color={theme.text} />
       </TouchableOpacity>
     </View>
-  );
+  ), [theme, onBookmarksPress, onSettingsPress]);
 
   const renderEmpty = () => {
+    // Show error state if loading failed and no articles
+    if (loadError && rawArticles.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>🛸</Text>
+          <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+            The news goblins are taking a break
+          </Text>
+          <Text style={[styles.emptySubtext, { color: theme.textMuted }]}>
+            Pull down to try again
+          </Text>
+        </View>
+      );
+    }
+    
     // Don't show empty state until we've completed at least one load
     if (!hasLoadedOnce) return null;
     
@@ -331,6 +353,16 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     );
   };
 
+  // Article count text
+  const articleCountText = useMemo(() => {
+    const count = articles.length;
+    if (category === 'all') {
+      return `${count} ${count === 1 ? 'story' : 'stories'}`;
+    }
+    const catLabel = CATEGORIES.find(c => c.id === category)?.label || category;
+    return `${count} ${count === 1 ? 'story' : 'stories'} in ${catLabel}`;
+  }, [articles.length, category]);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       {bugsEnabled && <ScreenBugs chaosMode={chaosMode} />}
@@ -343,6 +375,11 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         sortBy={sortBy}
         onSortChange={setSortBy}
       />
+      {hasLoadedOnce && articles.length > 0 && (
+        <Text style={[styles.articleCount, { color: theme.textMuted }]}>
+          {articleCountText}
+        </Text>
+      )}
       
       {loading && !hasLoadedOnce ? (
         <WeirdLoader theme={theme} />
@@ -425,5 +462,18 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingHorizontal: 40,
+  },
+  articleCount: {
+    fontSize: 12,
+    textAlign: 'center',
+    paddingVertical: 4,
+    letterSpacing: 0.3,
   },
 });

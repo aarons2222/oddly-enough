@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  Share,
   Platform,
   Dimensions,
   ActivityIndicator,
@@ -36,7 +37,7 @@ const HERO_HEIGHT = height * 0.55;
 const API_URL = 'https://oddly-enough-api.vercel.app';
 
 export function ArticleScreen({ article, onBack }: Props) {
-  const { isDarkMode, fontScale } = useApp();
+  const { isDarkMode, fontScale, bugsEnabled, chaosMode } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   const categoryInfo = CATEGORIES.find(c => c.id === article.category);
   const insets = useSafeAreaInsets();
@@ -171,9 +172,17 @@ export function ArticleScreen({ article, onBack }: Props) {
       return;
     }
     
-    // 2. Fetch from API
+    // 2. Fetch from API with 8s timeout
     try {
-      const response = await fetch(`${API_URL}/api/content?url=${encodeURIComponent(article.url)}`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      
+      const response = await fetch(
+        `${API_URL}/api/content?url=${encodeURIComponent(article.url)}`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      
       if (response.ok) {
         const data = await response.json();
         if (data.content) {
@@ -185,7 +194,7 @@ export function ArticleScreen({ article, onBack }: Props) {
         }
       }
     } catch (error) {
-      // Content fetch failed, will show summary
+      // Content fetch failed or timed out, will show summary
     }
     
     // 3. Fallback to summary with "read more" prompt
@@ -295,7 +304,7 @@ export function ArticleScreen({ article, onBack }: Props) {
       />
       
       {/* Screen Bugs */}
-      <ScreenBugs />
+      {bugsEnabled && <ScreenBugs chaosMode={chaosMode} />}
       
       {/* Floating Back Button - Outside ScrollView */}
       <Animated.View 
@@ -539,19 +548,6 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 100,
   },
-  backButtonInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 25,
-    gap: 6,
-    ...(Platform.OS === 'web' ? {
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-    } : {}),
-  },
   closeButtonCircle: {
     width: 40,
     height: 40,
@@ -563,11 +559,6 @@ const styles = StyleSheet.create({
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
     } : {}),
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
   
   // Hero Content

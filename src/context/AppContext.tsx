@@ -108,9 +108,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleDarkMode = () => {
-    // Simple toggle: light <-> dark
-    const next: DarkModePreference = darkModePreference === 'light' ? 'dark' : 'light';
-    setDarkModePreference(next);
+    // Cycle: light → dark → auto → light
+    const cycle: Record<DarkModePreference, DarkModePreference> = {
+      light: 'dark',
+      dark: 'auto',
+      auto: 'light',
+    };
+    setDarkModePreference(cycle[darkModePreference]);
   };
 
   const setFontSize = async (size: FontSize) => {
