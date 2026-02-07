@@ -225,14 +225,18 @@
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
+      const sourceUrl = params.get('url');
       
-      if (!id) {
+      if (!id && !sourceUrl) {
         showError('No article specified', 'Browse all stories →', '/');
         return;
       }
       
       try {
-        const res = await fetch(`${API_BASE}/api/article?id=${encodeURIComponent(id)}`);
+        const apiParam = id
+          ? `id=${encodeURIComponent(id)}`
+          : `url=${encodeURIComponent(sourceUrl)}`;
+        const res = await fetch(`${API_BASE}/api/article?${apiParam}`);
         if (!res.ok) throw new Error('Not found');
         
         const data = await res.json();
