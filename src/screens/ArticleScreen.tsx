@@ -447,31 +447,25 @@ export function ArticleScreen({ article, onBack }: Props) {
                 <ActivityIndicator size="small" color={theme.accent} />
                 <Text style={[styles.loadingText, { color: theme.textMuted }]}>Loading full article...</Text>
               </View>
-            ) : fullContent ? (
-              fullContent.split('\n\n').map((paragraph, index) => (
+            ) : (
+              (fullContent || article.summary).split('\n\n').map((paragraph, index) => (
                 <Text key={index} style={[styles.paragraph, { color: theme.text, fontSize: 17 * fontScale, lineHeight: 28 * fontScale }]}>
                   {paragraph}
                 </Text>
               ))
-            ) : (
-              <View style={styles.readMoreContainer}>
-                <Text style={[styles.readMoreText, { color: theme.textSecondary }]}>
-                  Tap below to read the full article on {article.source}
-                </Text>
-              </View>
             )}
           </View>
 
-          {/* Source Link */}
+          {/* Source attribution */}
           <TouchableOpacity 
             style={[styles.sourceLink, { borderColor: theme.border }]} 
             onPress={handleOpenSource}
             activeOpacity={0.7}
           >
             <Text style={[styles.sourceLinkText, { color: theme.textSecondary }]}>
-              Continue reading on <Text style={styles.sourceName}>{article.source}</Text>
+              Source: <Text style={styles.sourceName}>{article.source}</Text>
             </Text>
-            <PlatformIcon name="arrow-forward" size={18} color={theme.textMuted} />
+            <PlatformIcon name="open-outline" size={16} color={theme.textMuted} />
           </TouchableOpacity>
 
           {/* Footer Spacing */}

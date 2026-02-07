@@ -69,7 +69,7 @@ interface Props {
 }
 
 export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress }: Props) {
-  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled } = useApp();
+  const { isDarkMode, addBookmark, removeBookmark, isBookmarked, setReaction, getReaction, chaosMode, bugsEnabled, fontScale } = useApp();
   const theme = isDarkMode ? darkTheme : lightTheme;
   
   const [rawArticles, setRawArticles] = useState<Article[]>([]);
@@ -302,6 +302,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
               theme={theme}
               chaosMode={chaosMode}
               stats={stats}
+              fontScale={fontScale}
             />
           </View>
         </UfoAbduction>

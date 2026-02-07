@@ -25,7 +25,7 @@ interface Props {
   stats?: ArticleStats;
 }
 
-export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false, stats }: Props) {
+export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookmark, onReact, theme = lightTheme, chaosMode = false, stats, fontScale = 1 }: Props & { fontScale?: number }) {
   const [imageError, setImageError] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
   const prevImageUrl = useRef(article.imageUrl);
@@ -201,11 +201,11 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           <Text style={[styles.time, { color: theme.textMuted }]}>{timeAgo}</Text>
         </View>
         
-        <Text style={[styles.title, { color: chaosTextColor, fontStyle: chaosFontStyle }]} numberOfLines={3}>
+        <Text style={[styles.title, { color: chaosTextColor, fontStyle: chaosFontStyle, fontSize: 18 * fontScale }]} numberOfLines={3}>
           {article.title}
         </Text>
         
-        <Text style={[styles.summary, { color: theme.textSecondary }]} numberOfLines={2}>
+        <Text style={[styles.summary, { color: theme.textSecondary, fontSize: 14 * fontScale }]} numberOfLines={2}>
           {article.summary}
         </Text>
         
