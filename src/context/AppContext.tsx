@@ -50,7 +50,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (darkModePreference === 'auto' && isNightTime());
 
   // Font scale multiplier
-  const fontScale = fontSize === 'small' ? 0.85 : fontSize === 'large' ? 1.15 : 1;
+  const fontScale = fontSize === 'small' ? 0.8 : fontSize === 'large' ? 1.25 : 1;
 
   // Load saved preferences
   useEffect(() => {
