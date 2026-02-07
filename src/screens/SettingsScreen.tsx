@@ -163,7 +163,7 @@ export function SettingsScreen({ onBack }: Props) {
             <View style={[styles.card, styles.cardColumn, { backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', borderColor: isDarkMode ? '#2a2a4e' : '#e0e0ff' }]}>
               <View style={styles.cardRow}>
                 <View style={[styles.cardIconBg, { backgroundColor: isDarkMode ? '#2a2a4e' : '#f0f0ff' }]}>
-                  <Text style={styles.cardEmoji}>{darkModePreference === 'dark' ? '🌙' : darkModePreference === 'auto' ? '🔄' : '☀️'}</Text>
+                  <Text style={styles.cardEmoji}>{darkModePreference === 'dark' ? '🌙' : darkModePreference === 'auto' ? '🌗' : '☀️'}</Text>
                 </View>
                 <View style={styles.cardContent}>
                   <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
@@ -178,7 +178,7 @@ export function SettingsScreen({ onBack }: Props) {
                 {([
                   { key: 'light' as const, label: 'Light ☀️' },
                   { key: 'dark' as const, label: 'Dark 🌙' },
-                  { key: 'auto' as const, label: 'Auto 🔄' },
+                  { key: 'auto' as const, label: 'Auto 🌗' },
                 ]).map(opt => (
                   <TouchableOpacity
                     key={opt.key}
