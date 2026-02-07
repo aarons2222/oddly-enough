@@ -376,12 +376,6 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
         sortBy={sortBy}
         onSortChange={setSortBy}
       />
-      {hasLoadedOnce && articles.length > 0 && (
-        <Text style={[styles.articleCount, { color: theme.textMuted }]}>
-          {articleCountText}
-        </Text>
-      )}
-      
       {loading && !hasLoadedOnce ? (
         <WeirdLoader theme={theme} />
       ) : (
