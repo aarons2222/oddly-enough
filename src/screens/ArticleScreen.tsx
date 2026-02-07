@@ -357,7 +357,7 @@ export function ArticleScreen({ article, onBack }: Props) {
         {/* Hero Section */}
         <View style={styles.heroContainer}>
           {/* Hero Image with Parallax */}
-          {article.imageUrl ? (
+          {article.imageUrl && !article.imageUrl.includes('placeholder') && !article.imageUrl.includes('dummyimage') ? (
             <Animated.Image 
               source={{ uri: article.imageUrl }} 
               style={[
@@ -373,7 +373,7 @@ export function ArticleScreen({ article, onBack }: Props) {
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.heroImage, styles.heroPlaceholder]} />
+            <View style={[styles.heroImage, styles.heroPlaceholder, { backgroundColor: '#FF6B6B' }]} />
           )}
 
           {/* Gradient Overlay */}
@@ -434,11 +434,13 @@ export function ArticleScreen({ article, onBack }: Props) {
 
         {/* Article Body */}
         <View style={[styles.articleBody, { backgroundColor: theme.card }]}>
-          {/* Lead/Summary */}
-          <Text style={[styles.lead, { color: theme.textSecondary, fontSize: 18 * fontScale }]}>{article.summary}</Text>
-
-          {/* Divider */}
-          <View style={[styles.divider, { backgroundColor: theme.border }]} />
+          {/* Lead/Summary - only show if we have full content (avoids duplicate) */}
+          {fullContent && fullContent !== article.summary ? (
+            <>
+              <Text style={[styles.lead, { color: theme.textSecondary, fontSize: 18 * fontScale }]}>{article.summary}</Text>
+              <View style={[styles.divider, { backgroundColor: theme.border }]} />
+            </>
+          ) : null}
 
           {/* Content */}
           <View style={styles.body}>
