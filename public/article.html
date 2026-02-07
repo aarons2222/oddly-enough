@@ -283,7 +283,7 @@
         }
         
         // Content — loading placeholder, filled async
-        html += '<div id="article-content" class="content"><p style="color:#666;font-style:italic;">Loading full story...</p></div>';
+        html += '<div id="article-content" class="content"><p style="color:#555;font-style:italic;">Loading full story…</p></div>';
         
         // Source link — prominent CTA to read full article
         html += `<a href="${a.url}" target="_blank" rel="noopener" class="source-link">
@@ -357,10 +357,11 @@
           const paragraphs = data.content.split(/\n\n/).filter(p => p.trim());
           el.innerHTML = paragraphs.map(p => `<p>${escapeHtml(p.trim())}</p>`).join('');
         } else {
-          el.innerHTML = '';
+          // No extractable content — show a friendly nudge to read the source
+          el.innerHTML = '<p style="color:#666;text-align:center;padding:20px 0;">👆 Tap the link above to read the full story</p>';
         }
       } catch (e) {
-        el.innerHTML = '';
+        el.innerHTML = '<p style="color:#666;text-align:center;padding:20px 0;">👆 Tap the link above to read the full story</p>';
       }
     }
 
