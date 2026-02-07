@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import { WeirdLoader } from '../components/WeirdLoader';
 import { UfoRefresh } from '../components/UfoRefresh';
 import { ScreenBugs } from '../components/ScreenBugs';
 import { UfoAbduction } from '../components/UfoAbduction';
+import { OddityCatcher } from '../components/OddityCatcher';
 import { useApp, lightTheme, darkTheme } from '../context/AppContext';
 
 // Stable references outside component to prevent re-renders
@@ -46,6 +47,9 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [articleStats, setArticleStats] = useState<Record<string, ArticleStats>>({});
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [showGame, setShowGame] = useState(false);
+  const logoTapCount = useRef(0);
+  const logoTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Deduplicate articles by similar titles or same URL
   const deduplicateArticles = (articles: Article[]): Article[] => {
@@ -277,6 +281,27 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
     setCategory(newCategory);
   };
 
+  const handleLogoTap = () => {
+    // Clear previous timer
+    if (logoTapTimer.current) clearTimeout(logoTapTimer.current);
+    
+    logoTapCount.current += 1;
+    
+    if (logoTapCount.current >= 10) {
+      logoTapCount.current = 0;
+      setShowGame(true);
+      return;
+    }
+    
+    // Reset counter after 3 seconds of no taps
+    logoTapTimer.current = setTimeout(() => {
+      logoTapCount.current = 0;
+    }, 3000);
+    
+    // Still do refresh on single tap (only if not building toward easter egg)
+    // Actually, let's just count taps — refresh is on pull-down anyway
+  };
+
   const renderArticle = useCallback(({ item, index }: { item: Article; index: number }) => {
     // Chaos mode: random slight rotation for each card
     const chaosRotation = chaosMode ? (Math.sin(index * 1.5) * 2) : 0;
@@ -307,7 +332,7 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       <TouchableOpacity onPress={onBookmarksPress} style={styles.headerButton}>
         <PlatformIcon name="bookmark" size={26} color={theme.text} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleRefresh} style={styles.logoContainer} activeOpacity={0.7}>
+      <TouchableOpacity onPress={handleLogoTap} style={styles.logoContainer} activeOpacity={0.7}>
         <Text style={[styles.logo, { color: theme.text }]}>Oddly</Text>
         <Text style={styles.logoAccent}>Enough</Text>
         {Platform.OS === 'web' && (
@@ -333,6 +358,14 @@ export function FeedScreen({ onArticleSelect, onBookmarksPress, onSettingsPress 
       </View>
     );
   };
+
+  if (showGame) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <OddityCatcher theme={theme} onClose={() => setShowGame(false)} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
