@@ -31,7 +31,7 @@ const FALLBACK_ARTICLES: Article[] = [
     url: 'https://www.mirror.co.uk/news/weird-news/dad-buys-pirate-ship-ebay-36634191',
     imageUrl: 'https://i2-prod.mirror.co.uk/article36635314.ece/ALTERNATES/s1200/622779517_10162341983697843_2559324211036302931_n.jpg',
     source: 'Mirror',
-    category: 'property',
+    category: 'culture',
     publishedAt: new Date('2026-01-29'),
   },
 ];
