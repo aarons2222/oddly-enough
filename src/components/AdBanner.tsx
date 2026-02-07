@@ -6,10 +6,10 @@ interface Props {
   size?: 'banner' | 'largeBanner' | 'mediumRectangle';
 }
 
-// Test ad unit IDs (replace with real ones for production)
-const TEST_BANNER_ID = Platform.select({
-  ios: 'ca-app-pub-3940256099942544/2435281174',
-  android: 'ca-app-pub-3940256099942544/6300978111',
+// Real ad unit IDs
+const BANNER_ID = Platform.select({
+  ios: 'ca-app-pub-2072049563537333/6144896352',
+  android: 'ca-app-pub-3940256099942544/6300978111', // TODO: create Android ad unit
   default: '',
 });
 
@@ -46,7 +46,7 @@ export function AdBanner({ style, size = 'banner' }: Props) {
   return (
     <View style={[styles.container, style]}>
       <BannerAd
-        unitId={TEST_BANNER_ID}
+        unitId={BANNER_ID}
         size={adSize}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,
@@ -71,7 +71,7 @@ export function FeedAdBanner() {
   return (
     <View style={styles.feedAd}>
       <BannerAd
-        unitId={TEST_BANNER_ID}
+        unitId={BANNER_ID}
         size={BannerAdSize.MEDIUM_RECTANGLE}
         requestOptions={{
           requestNonPersonalizedAdsOnly: true,
