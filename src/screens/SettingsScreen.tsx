@@ -207,10 +207,10 @@ export function SettingsScreen({ onBack }: Props) {
                 </View>
                 <View style={styles.cardContent}>
                   <Text style={[styles.cardTitle, { color: isDarkMode ? '#fff' : '#222' }]}>
-                    Font Size
+                    Reading Size
                   </Text>
                   <Text style={[styles.cardDesc, { color: isDarkMode ? '#888' : '#666' }]}>
-                    Make it readable
+                    Text size when reading articles
                   </Text>
                 </View>
               </View>
