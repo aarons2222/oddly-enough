@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Dynamic OG tags set by JS, fallback defaults -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Oddly Enough">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <title>Oddly Enough</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #121212;
+      color: #E0E0E0;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #2A2A2A;
+      position: sticky;
+      top: 0;
+      background: #121212;
+      z-index: 100;
+    }
+    .header a { text-decoration: none; }
+    .logo { font-size: 22px; font-weight: 800; color: #E0E0E0; }
+    .logo-accent { color: #FF6B6B; margin-left: 4px; }
+    
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      gap: 16px;
+    }
+    .loading-emoji { font-size: 48px; animation: float 2s ease-in-out infinite; }
+    .loading-text { color: #888; font-size: 14px; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    
+    /* Article */
+    .article { max-width: 680px; margin: 0 auto; padding: 0 0 100px; }
+    
+    .hero-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: #1E1E1E;
+    }
+    
+    .article-body { padding: 24px 20px; }
+    
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #2A2A2A;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #AAA;
+    }
+    .source { font-size: 12px; color: #888; font-weight: 600; }
+    .dot { color: #555; font-size: 12px; }
+    .time { font-size: 12px; color: #888; }
+    
+    .title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #F0F0F0;
+      margin-bottom: 16px;
+    }
+    
+    .summary {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #BBB;
+      margin-bottom: 24px;
+      font-style: italic;
+      border-left: 3px solid #FF6B6B;
+      padding-left: 16px;
+    }
+    
+    .content {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #CCC;
+    }
+    .content p { margin-bottom: 16px; }
+    
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #4ECDC4;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 24px;
+      padding: 10px 16px;
+      border: 1px solid #4ECDC4;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .source-link:hover { background: rgba(78,205,196,0.1); }
+    
+    /* CTA Banner */
+    .cta {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 200;
+    }
+    .cta-text { color: #fff; font-weight: 700; font-size: 14px; }
+    .cta-sub { color: rgba(255,255,255,0.85); font-size: 12px; }
+    .cta-btn {
+      background: #fff;
+      color: #FF6B6B;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    /* Error */
+    .error {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .error-emoji { font-size: 48px; margin-bottom: 12px; }
+    .error-text { color: #888; font-size: 16px; margin-bottom: 8px; }
+    .error-link { color: #4ECDC4; text-decoration: none; font-weight: 600; }
+    
+    /* Weirdness meter */
+    .weirdness {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      padding: 12px 16px;
+      background: #1E1E1E;
+      border-radius: 12px;
+    }
+    .weirdness-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .weirdness-bar { flex: 1; height: 6px; background: #2A2A2A; border-radius: 3px; overflow: hidden; }
+    .weirdness-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+    .weirdness-score { font-size: 14px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="/">
+      <span class="logo">Oddly<span class="logo-accent">Enough</span></span>
+    </a>
+  </div>
+  
+  <div id="content">
+    <div class="loading">
+      <div class="loading-emoji">🔮</div>
+      <div class="loading-text">Summoning the weirdness...</div>
+    </div>
+  </div>
+  
+  <!-- CTA Banner -->
+  <div class="cta" id="cta" style="display:none;">
+    <div>
+      <div class="cta-text">📱 Get Oddly Enough</div>
+      <div class="cta-sub">More weird stories in the app</div>
+    </div>
+    <a href="https://apps.apple.com/gb/app/oddly-enough-news/id6758560461" class="cta-btn">Download</a>
+  </div>
+
+  <script>
+    const API_BASE = 'https://oddly-enough-api.vercel.app';
+    
+    const CATEGORY_EMOJI = {
+      world: '🌍', science: '🔬', animals: '🐾', food: '🍕',
+      crime: '🔪', tech: '🤖', florida: '🐊', history: '📜',
+      space: '🚀', sports: '🏆', health: '🏥', culture: '🎭',
+    };
+    
+    function timeAgo(dateStr) {
+      const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return `${Math.floor(seconds/60)} min ago`;
+      if (seconds < 86400) return `${Math.floor(seconds/3600)}h ago`;
+      return `${Math.floor(seconds/86400)}d ago`;
+    }
+    
+    function weirdnessColor(score) {
+      if (score >= 8) return '#FF6B6B';
+      if (score >= 6) return '#FFE66D';
+      if (score >= 4) return '#4ECDC4';
+      return '#95E1D3';
+    }
+    
+    async function loadArticle() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      
+      if (!id) {
+        showError('No article specified', 'Browse all stories →', '/');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/article?id=${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Not found');
+        
+        const data = await res.json();
+        const a = data.article;
+        
+        // Update page title & OG tags
+        document.title = `${a.title} — Oddly Enough`;
+        
+        // Update meta tags for social sharing
+        setMeta('og:title', a.title);
+        setMeta('og:description', a.summary);
+        setMeta('og:image', a.imageUrl || '');
+        setMeta('og:url', window.location.href);
+        setMeta('twitter:title', a.title);
+        setMeta('twitter:description', a.summary);
+        setMeta('twitter:image', a.imageUrl || '');
+        
+        const emoji = CATEGORY_EMOJI[a.category] || '📰';
+        const catLabel = a.category.charAt(0).toUpperCase() + a.category.slice(1);
+        
+        let html = '<div class="article">';
+        
+        // Hero image
+        if (a.imageUrl && !a.imageUrl.includes('dummyimage')) {
+          html += `<img class="hero-image" src="${a.imageUrl}" alt="${escapeHtml(a.title)}" onerror="this.style.display='none'">`;
+        }
+        
+        html += '<div class="article-body">';
+        
+        // Meta
+        html += `<div class="meta">
+          <span class="category-badge">${emoji} ${catLabel}</span>
+          <span class="source">${escapeHtml(a.source)}</span>
+          <span class="dot">•</span>
+          <span class="time">${timeAgo(a.publishedAt)}</span>
+        </div>`;
+        
+        // Title
+        html += `<h1 class="title">${escapeHtml(a.title)}</h1>`;
+        
+        // Summary
+        if (a.summary) {
+          html += `<div class="summary">${escapeHtml(a.summary)}</div>`;
+        }
+        
+        // Content
+        if (a.content && a.content !== a.summary) {
+          // Split into paragraphs
+          const paragraphs = a.content.split(/\n\n|\n/).filter(p => p.trim());
+          html += '<div class="content">';
+          paragraphs.forEach(p => {
+            html += `<p>${escapeHtml(p.trim())}</p>`;
+          });
+          html += '</div>';
+        }
+        
+        // Source link
+        html += `<a href="${a.url}" target="_blank" rel="noopener" class="source-link">
+          Read original on ${escapeHtml(a.source)} →
+        </a>`;
+        
+        // Weirdness meter
+        if (a.weirdnessScore) {
+          const score = Math.min(10, Math.max(0, a.weirdnessScore));
+          html += `<div class="weirdness">
+            <span class="weirdness-label">Weirdness</span>
+            <div class="weirdness-bar">
+              <div class="weirdness-fill" style="width:${score*10}%;background:${weirdnessColor(score)}"></div>
+            </div>
+            <span class="weirdness-score" style="color:${weirdnessColor(score)}">${score}/10</span>
+          </div>`;
+        }
+        
+        html += '</div></div>';
+        
+        document.getElementById('content').innerHTML = html;
+        document.getElementById('cta').style.display = 'flex';
+        
+      } catch (e) {
+        console.error('Failed to load article:', e);
+        showError('Article not found', 'Browse all stories →', '/');
+      }
+    }
+    
+    function showError(message, linkText, linkHref) {
+      document.getElementById('content').innerHTML = `
+        <div class="error">
+          <div class="error-emoji">🛸</div>
+          <div class="error-text">${message}</div>
+          <a href="${linkHref}" class="error-link">${linkText}</a>
+        </div>
+      `;
+    }
+    
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    
+    function setMeta(property, content) {
+      let el = document.querySelector(`meta[property="${property}"]`) || document.querySelector(`meta[name="${property}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        if (property.startsWith('og:')) {
+          el.setAttribute('property', property);
+        } else {
+          el.setAttribute('name', property);
+        }
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    }
+    
+    loadArticle();
+  </script>
+</body>
+</html>

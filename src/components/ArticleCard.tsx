@@ -111,8 +111,11 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
     opacity: fabAnim,
   };
   
+  // Generate a shareable link that opens in our app/web viewer (not the source)
+  const shareUrl = `https://oddly-enough.vercel.app/article.html?id=${encodeURIComponent(article.id)}`;
+  
   const handleShare = async () => {
-    const shareText = `${article.title}\n\n${article.summary}\n\nRead more: ${article.url}`;
+    const shareText = `${article.title}\n\n${shareUrl}`;
     
     if (Platform.OS === 'web') {
       // Try Web Share API first (works on mobile Safari)
@@ -121,11 +124,10 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           await navigator.share({
             title: article.title,
             text: article.summary,
-            url: article.url,
+            url: shareUrl,
           });
           return;
         } catch (error: any) {
-          // User cancelled or not supported - fall through to clipboard
           if (error.name === 'AbortError') return;
         }
       }
@@ -133,12 +135,11 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
       // Fallback: copy to clipboard
       try {
         if (typeof navigator !== 'undefined' && navigator.clipboard) {
-          await navigator.clipboard.writeText(article.url);
+          await navigator.clipboard.writeText(shareUrl);
           alert('Link copied to clipboard!');
         } else {
-          // Last resort fallback
           const textArea = document.createElement('textarea');
-          textArea.value = article.url;
+          textArea.value = shareUrl;
           document.body.appendChild(textArea);
           textArea.select();
           document.execCommand('copy');
@@ -146,7 +147,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
           alert('Link copied!');
         }
       } catch (err) {
-        alert(`Share this link: ${article.url}`);
+        alert(`Share this link: ${shareUrl}`);
       }
     } else {
       // Native share
@@ -155,7 +156,7 @@ export const ArticleCard = memo(function ArticleCard({ article, onPress, onBookm
         await Share.share({
           title: article.title,
           message: shareText,
-          url: article.url,
+          url: shareUrl,
         });
       } catch (error) {
         console.error('Error sharing:', error);
