@@ -2,5 +2,9 @@
   "buildCommand": "npx expo export --platform web && cp -r public/* dist/",
   "outputDirectory": "dist",
   "framework": null,
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/article", "destination": "/article.html" },
+    { "source": "/welcome", "destination": "/welcome.html" }
+  ]
 }
